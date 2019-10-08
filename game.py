@@ -139,6 +139,7 @@ class Game:
         self._player_name = player_name
         self._running = True
         self._score = INITIAL_SCORE
+        self._bomberman = Bomberman(self.map.bomberman_spawn, self._initial_lives)
 
         self.next_level(self.initial_level)
 
@@ -154,17 +155,17 @@ class Game:
 
         logger.info("NEXT LEVEL")
         self.map = Map(level=level, size=self.map.size, enemies=len(LEVEL_ENEMIES[level]))
+        self._bomberman.respawn()
         self._step = 0
-        self._bomberman = Bomberman(self.map.bomberman_spawn, self._initial_lives)
         self._bombs = []
         self._powerups = []
         self._bonus = []
         self._exit = []
         self._lastkeypress = ""
-        self._bomb_radius = 3
         self._enemies = [
             t(p) for t, p in zip(LEVEL_ENEMIES[level], self.map.enemies_spawn)
         ]
+        logger.debug(self._enemies)
 
     def quit(self):
         logger.debug("Quit")
@@ -277,14 +278,15 @@ class Game:
 
         self.explode_bomb()
         self.update_bomberman()
+        self.collision()
 
         if (
             self._step % (self._bomberman.powers.count(Powerups.Speed) + 1) == 0
         ):  # increase speed of bomberman by moving enemies less often
             for enemy in self._enemies:
                 enemy.move(self.map, self._bomberman, self._bombs)
+            self.collision()
 
-        self.collision()
         self._state = {
             "level": self.map.level,
             "step": self._step,

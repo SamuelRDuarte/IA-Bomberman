@@ -5,6 +5,7 @@ import websockets
 import getpass
 import os
 
+from defs import *
 from mapa import Map
 
 
@@ -27,10 +28,21 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                 # Next lines are only for the Human Agent, the key values are nonetheless the correct ones!
                 key = ""
 
+                print(state)
+                
+                first_wall = state['walls'][0]                
+                my_pos = state['bomberman']
+                
+                next_step = goto(my_pos, first_wall)
+
+                print(next_step)
+
+                key = next_step
+                
                 await websocket.send(
                     json.dumps({"cmd": "key", "key": key})
                 )  # send key command to server - you must implement this send in the AI agent
-                break
+                #break
             except websockets.exceptions.ConnectionClosedOK:
                 print("Server has cleanly disconnected us")
                 return
