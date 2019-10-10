@@ -8,6 +8,18 @@ import os
 from defs import *
 from mapa import Map
 
+def novapos(pos,mapa):
+    x,y = pos
+    if not mapa.is_stone((x,y+1)):
+        return 's'
+    if not mapa.is_stone((x+1,y)):
+       return 'd'
+    if not mapa.is_stone((x-1,y)):
+        return 'a'
+    if not mapa.is_stone((x,y-1)):
+        return 'a'
+
+
 
 async def agent_loop(server_address="localhost:8000", agent_name="student"):
     async with websockets.connect(f"ws://{server_address}/player") as websocket:
@@ -27,17 +39,23 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                 )  # receive game state, this must be called timely or your game will get out of sync with the server                
                 # Next lines are only for the Human Agent, the key values are nonetheless the correct ones!
                 key = ""
-
+                
                 print(state)
                 
                 first_wall = state['walls'][0]                
                 my_pos = state['bomberman']
-                
+
                 next_step = goto(my_pos, first_wall)
 
                 print(next_step)
 
-                key = next_step
+                new_pos = mapa.calc_pos(my_pos,next_step)
+
+                if my_pos != new_pos:
+                    key = next_step
+                else:
+                    key = novapos(my_pos,mapa)
+                    
                 
                 await websocket.send(
                     json.dumps({"cmd": "key", "key": key})
