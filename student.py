@@ -11,13 +11,18 @@ from mapa import Map
 def novapos(pos,mapa):
     x,y = pos
     if not mapa.is_stone((x,y+1)):
+        print("BAIXO\n")
         return 's'
     if not mapa.is_stone((x+1,y)):
-       return 'd'
+        print("DIREITA\n")
+        return 'd'
     if not mapa.is_stone((x-1,y)):
+        print("ESQUERDA\n")
         return 'a'
     if not mapa.is_stone((x,y-1)):
+        print("CIMA\n")
         return 'a'
+
 
 
 
@@ -41,11 +46,14 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                 key = ""
                 
                 print(state)
-                
+
                 first_wall = state['walls'][0]                
                 my_pos = state['bomberman']
 
-                next_step = goto(my_pos, first_wall)
+                if not foundWall(my_pos,first_wall):
+                    next_step = goto(my_pos, first_wall)
+                else:
+                    next_step= goto(my_pos,[30,30])   #coordenadas à toa
 
                 print(next_step)
 
@@ -55,8 +63,8 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                     key = next_step
                 else:
                     key = novapos(my_pos,mapa)
-                    
-                
+
+
                 await websocket.send(
                     json.dumps({"cmd": "key", "key": key})
                 )  # send key command to server - you must implement this send in the AI agent

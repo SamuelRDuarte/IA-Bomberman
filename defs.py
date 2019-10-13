@@ -23,6 +23,18 @@ def goto(origem, destino):
     return vector2dir(dx - ox, dy - oy)
 
 
+def foundWall(pos,wall):
+    dist1= pos[0] - wall[0]
+    dist2= pos[1]-wall[1]
+
+    if dist1>=-1 and dist1<=1:
+        return True
+    elif dist2>=-1 and dist2<=1:
+        return True
+    else:
+        return False
+
+
 def closeToWall(pos, wall):             # verificar a distancia ate uma parede (pode estar atras de uma parede indestrutivel pelo meio)
     if len(pos) != 2 or len(wall) != 2:
         return False
