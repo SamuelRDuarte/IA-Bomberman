@@ -65,28 +65,39 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                         key = ''
 
                 else: # nao ha bombas, ve se ta perto de uma parede para por bomba
-                    print("Procurar parede...")
-                    wall = next_wall(my_pos, state['walls'])
+                    if state['walls'] == [] and state['enemies'] !=[]:
+                        print("going to kill enemies")
+                        if dist_to(my_pos, (1,1)) == 0:
+                            key = 'B'
+                            ways.append('B')
+                        else:
+                            key = goto(my_pos,(1,1))
+                    if state['walls'] == [] and state['enemies'] ==[]:
+                        print("going to exit")
+                        key = goto(my_pos,state['exit'])
+                    if state['walls'] == [] and state['powerups'] !=[]:
+                        print("going to powerups")
+                        key = goto(my_pos,state['powerups'][0][0])
+                    if state['walls'] != []:
+                        print("Procurar parede...")
+                        wall = next_wall(my_pos, state['walls'])
 
-                    print('dist to wall: ', end='')
-                    print(dist_to(my_pos, wall))
+                        print('dist to wall: ', end='')
+                        print(dist_to(my_pos, wall))
 
-                    if dist_to(my_pos, wall) <= 1:
-                        print('Cheguei à parede!')
-                        key = 'B'
-                        ways.append('B')
+                        if dist_to(my_pos, wall) <= 1:
+                            print('Cheguei à parede!')
+                            key = 'B'
+                            ways.append('B')
 
-                    else:
-                        key = goto(my_pos, wall)
+                        else:
+                            key = goto(my_pos, wall)
 
-                # apanhar powerups e ir para o portal
-                if state['enemies'] == [] and state['walls'] == []:
+                 # apanhar powerups e ir para o portal
+               ''' if state['enemies'] == [] and state['walls'] == []:
                     for powerup in state['powerups']:
-                        key = goto(my_pos, powerup[0])
+                        key = goto(my_pos, powerup[0])'''
 
-                    key = goto(my_pos, state['exit'])
-
-                    
                 if key != '':
                     if not key in ways:
                         key = choose_random_move(ways)
