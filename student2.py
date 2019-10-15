@@ -8,23 +8,6 @@ import os
 from defs import *
 from mapa import Map
 
-def novapos(pos,mapa):
-    x,y = pos
-    if not mapa.is_stone((x,y+1)):
-        print("BAIXO\n")
-        return 's'
-    if not mapa.is_stone((x+1,y)):
-        print("DIREITA\n")
-        return 'd'
-    if not mapa.is_stone((x-1,y)):
-        print("ESQUERDA\n")
-        return 'a'
-    if not mapa.is_stone((x,y-1)):
-        print("CIMA\n")
-        return 'a'
-
-
-
 
 async def agent_loop(server_address="localhost:8000", agent_name="student"):
     async with websockets.connect(f"ws://{server_address}/player") as websocket:
@@ -51,29 +34,40 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                 first_wall = state['walls'][0]                
                 my_pos = state['bomberman']
 
-                '''
-                if not foundWall(my_pos,first_wall):
-                    next_step = goto(my_pos, first_wall)
-                else:
-                    next_step= goto(my_pos, state['walls'][4])   #coordenadas à toa
-                '''
+                ways = get_possible_ways(mapa, my_pos)
+                print('ways: ', end='')
+                print(ways)
 
-                next_step = goto(my_pos, first_wall)
 
-                new_pos = mapa.calc_pos(my_pos, next_step)
+                key = goto(my_pos, first_wall)
 
-                if my_pos != new_pos:
-                    key = next_step
-                else:
-                    key = novapos(my_pos,mapa)
+                if not key in ways:
+                    key = choose_random_move(ways)
 
-                print(foundWall(my_pos, first_wall))
-                if foundWall(my_pos, first_wall):
-                    key = 'B'
-                    go_hide(state['bombs'], my_pos, previous_key)
+                # se houver bombas foge
+                if state['bombs'] != []:
+                    pos_bomb, t, raio = state['bombs'][0]
+                    sameDir = check_same_direction(pos_bomb, my_pos)
+                    print('same direction: ' + str(sameDir))
+
+                    # so verifica se nao esta na msm direcao que a bomba
+                    # falta: verificar se esta fora do raio e nao fugir de onde veio
+                    if sameDir:
+                        key = choose_random_move(ways)
+
+                    else: # esta seguro, espera ate a bomba rebentar
+                        key = ''
+
+                else: # nao ha bombas, ve se ta perto de uma parede para por bomba
+                    if dist_to_wall(my_pos, first_wall) <= 1:
+                        print('Cheguei à parede!')
+                        key = 'B'
+                    
+                print('dist to wall: ', end='')
+                print(dist_to_wall(my_pos, first_wall))
 
                 previous_key = key
-                print('Sending key: ' + next_step)
+                print('Sending key: ' + key)
 
                 await websocket.send(
                     json.dumps({"cmd": "key", "key": key})

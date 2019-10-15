@@ -1,5 +1,7 @@
 from game import Bomb
 from mapa import Map
+import math
+import random
 
 def vector2dir(vx, vy):
     m = max(abs(vx), abs(vy))
@@ -25,39 +27,119 @@ def goto(origem, destino):
 
     return vector2dir(dx - ox, dy - oy)
 
+def novapos(pos,mapa):
+    x,y = pos
+    if not mapa.is_stone((x,y+1)):
+        print("BAIXO\n")
+        return 's'
+    if not mapa.is_stone((x+1,y)):
+        print("DIREITA\n")
+        return 'd'
+    if not mapa.is_stone((x-1,y)):
+        print("ESQUERDA\n")
+        return 'a'
+    if not mapa.is_stone((x,y-1)):
+        print("CIMA\n")
+        return 'a'
 
-def foundWall(pos, wall):
-    dist1= pos[0] - wall[0]
-    dist2= pos[1] - wall[1]
+# para qualquer posicao retorna um lista de possoveis movimentos
+def get_possible_ways(mapa, position):  
+    ways = []
 
-    if dist1>=-1 and dist1<=1:
-        return True
-    elif dist2>=-1 and dist2<=1:
-        return True
-    else:
+    x, y = position
+    
+    if not mapa.is_blocked([x+1, y]):
+        ways.append('d')
+    if not mapa.is_blocked([x-1, y]):
+        ways.append('a')
+    if not mapa.is_blocked([x, y+1]):
+        ways.append('s')
+    if not mapa.is_blocked([x, y-1]):
+        ways.append('w')
+
+    return ways
+
+# da lista de possiveis caminhos escolhe um caminho random
+def choose_random_move(ways):
+    index = random.randint(0, len(ways)-1)
+    print('index: ' + str(index))
+    print('random: ' + ways[index])
+    return ways[index]
+
+# verifica se duas posicoes estao na msm direcao 
+def check_same_direction(pos1, pos2):
+    if len(pos1) != 2 or len(pos2) != 2:
         return False
 
+    x1, y1 = pos1
+    x2, y2 = pos2
 
-def go_hide(bombs, bomberman_pos, previous_key):
-    if bombs == []:
-        return
+    if x1 == x2 or y1 == y2:
+        return True
+
+    return False
+
+
+def dist_to_wall(pos1, pos2):
+    if len(pos1) != 2 or len(pos1) != 2:
+        return ''
+
+    x1, y1 = pos1
+    x2, y2 = pos2
+
+    return math.sqrt(math.pow((x2-x1), 2) + math.pow((y2-y1), 2))
+
+
+
+def go_hide(bomb, bomberman_pos, previous_key):
 
     bx = bomberman_pos[0]
     by = bomberman_pos[1]
 
-    for bomb in bombs:
-        if not bomb.in_range(bomberman_pos):
-            return
+    #print('raio: ' +  str(bomb[2]))
+    raio = bomb[2]
 
-        # so foge numa direcao
-        if previous_key == 'a': # fugir para a direita
-            return goto(bomberman_pos, [bx + bomb.radius + 1, by])
+    # so foge numa direcao
+    if previous_key == 'a': # fugir para a direita
+        return goto(bomberman_pos, [bx + raio + 1, by])
 
-        elif previous_key == 'd': # fugir para a esquerda
-            return goto(bomberman_pos, [bx - (bomb.radius + 1), by])
+    elif previous_key == 'd': # fugir para a esquerda
+        return goto(bomberman_pos, [bx - (raio + 1), by])
 
-        elif previous_key == 'w': # fugir para baixo
-            return goto(bomberman_pos, [bx, by + bomb.radius + 1])
+    elif previous_key == 'w': # fugir para baixo
+        return goto(bomberman_pos, [bx, by + raio + 1])
             
-        elif previous_key == 's': # fugir para cima
-            return goto(bomberman_pos, [bx, by - (bomb.radius + 1)])
+    elif previous_key == 's': # fugir para cima
+        return goto(bomberman_pos, [bx, by - (raio + 1)])
+
+    else: print('nao fugi lixei me com f 0')
+
+
+def in_range(bomb, bomberman_pos, mapa):
+    bx, by, raio = bomb
+    mx, my = bomberman_pos
+
+    if by == my:
+        for r in range(raio + 1):
+            if mapa.is_stone((bx + r, by)):
+                break  # protected by stone to the right
+            if (mx, my) == (bx + r, by):
+                return True
+        for r in range(raio + 1):
+            if mapa.is_stone((bx - r, by)):
+                break  # protected by stone to the left 
+            if (mx, my) == (bx - r, by):
+                return True
+    if bx == mx:
+        for r in range(raio + 1):
+            if mapa.is_stone((bx, by + r)):
+                break  # protected by stone in the bottom
+            if (mx, my) == (bx, by + r):
+                return True
+        for r in range(raio + 1):
+            if mapa.is_stone((bx, by - r)):
+                break  # protected by stone in the top
+            if (mx, my) == (bx, by - r):
+                return True
+
+    return False
