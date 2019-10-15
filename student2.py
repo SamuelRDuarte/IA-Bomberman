@@ -44,15 +44,18 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                     sameDir = check_same_direction(pos_bomb, my_pos)
                     print('Same direction?: ' + str(sameDir))
 
-                    # so verifica se nao esta na msm direcao que a bomba
-                    # falta: verificar se esta fora do raio e nao fugir de onde veio
+                    # so verifica se:
+                    # nao esta na msm direcao que a bomba,
+                    # se esta fora do raio e 
+                    # nao foge de onde veio
                     if dist_to(my_pos, pos_bomb) <= raio:
                         if sameDir:
                             print('Fugirrr')
-                            direcao_proibida = inverse(previous_key)
-                            print('Proibido: ' + str(direcao_proibida))
-                            if direcao_proibida in ways:
-                                ways.remove(direcao_proibida)
+                            if dist_to(my_pos, pos_bomb) >= 1:
+                                direcao_proibida = inverse(previous_key)
+                                print('Proibido: ' + str(direcao_proibida))
+                                if direcao_proibida in ways:
+                                    ways.remove(direcao_proibida)
                                 key = choose_random_move(ways)
                             else:
                                 key = choose_random_move(ways)
@@ -63,18 +66,18 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
 
                 else: # nao ha bombas, ve se ta perto de uma parede para por bomba
                     print("Procurar parede...")
-                    first_wall = state['walls'][0]
+                    wall = next_wall(my_pos, state['walls'])
 
                     print('dist to wall: ', end='')
-                    print(dist_to(my_pos, first_wall))
+                    print(dist_to(my_pos, wall))
 
-                    if dist_to(my_pos, first_wall) <= 1:
+                    if dist_to(my_pos, wall) <= 1:
                         print('Cheguei à parede!')
                         key = 'B'
                         ways.append('B')
 
                     else:
-                        key = goto(my_pos, first_wall)
+                        key = goto(my_pos, wall)
 
                 if key != '':
                     if not key in ways:

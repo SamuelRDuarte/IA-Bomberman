@@ -27,21 +27,6 @@ def goto(origem, destino):
 
     return vector2dir(dx - ox, dy - oy)
 
-def novapos(pos,mapa):
-    x,y = pos
-    if not mapa.is_stone((x,y+1)):
-        print("BAIXO\n")
-        return 's'
-    if not mapa.is_stone((x+1,y)):
-        print("DIREITA\n")
-        return 'd'
-    if not mapa.is_stone((x-1,y)):
-        print("ESQUERDA\n")
-        return 'a'
-    if not mapa.is_stone((x,y-1)):
-        print("CIMA\n")
-        return 'a'
-
 # para qualquer posicao retorna um lista de possoveis movimentos
 def get_possible_ways(mapa, position):  
     ways = []
@@ -59,15 +44,10 @@ def get_possible_ways(mapa, position):
 
     return ways
 
-# da lista de possiveis caminhos escolhe um caminho random
+# da lista de possiveis caminhos escolhe o primeiro caminho
 def choose_random_move(ways):
-    if len(ways) == 1:
-        return ways[0]
-
-    index = random.randint(0, len(ways)-1)
-    print('index: ' + str(index))
-    print('random_key: ' + ways[index])
-    return ways[index]
+    if len(ways) != []:
+        return random.choice(ways)
 
 # dando uma key retorna a sua inversa
 def inverse(key):
@@ -103,60 +83,17 @@ def dist_to(pos1, pos2):
 
     return math.sqrt(math.pow((x2-x1), 2) + math.pow((y2-y1), 2))
 
+# calcula e retorna a parede mais proxima (mt ineficiente)
+def next_wall(bomberman_pos, walls):
+    if walls == []:
+        return 
 
-#def next_wall(walls): 
+    nwall = walls[0]
+    min_cost = dist_to(bomberman_pos, walls[0])
+    for wall in walls:
+        cost = dist_to(bomberman_pos, wall)
+        if cost < min_cost:
+            min_cost = cost
+            nwall = wall
 
-# ------------------------------------------------------------
-
-def go_hide(bomb, bomberman_pos, previous_key):
-
-    bx = bomberman_pos[0]
-    by = bomberman_pos[1]
-
-    #print('raio: ' +  str(bomb[2]))
-    raio = bomb[2]
-
-    # so foge numa direcao
-    if previous_key == 'a': # fugir para a direita
-        return goto(bomberman_pos, [bx + raio + 1, by])
-
-    elif previous_key == 'd': # fugir para a esquerda
-        return goto(bomberman_pos, [bx - (raio + 1), by])
-
-    elif previous_key == 'w': # fugir para baixo
-        return goto(bomberman_pos, [bx, by + raio + 1])
-            
-    elif previous_key == 's': # fugir para cima
-        return goto(bomberman_pos, [bx, by - (raio + 1)])
-
-    else: print('nao fugi lixei me com f 0')
-
-
-def in_range(bomb, bomberman_pos, mapa):
-    bx, by, raio = bomb
-    mx, my = bomberman_pos
-
-    if by == my:
-        for r in range(raio + 1):
-            if mapa.is_stone((bx + r, by)):
-                break  # protected by stone to the right
-            if (mx, my) == (bx + r, by):
-                return True
-        for r in range(raio + 1):
-            if mapa.is_stone((bx - r, by)):
-                break  # protected by stone to the left 
-            if (mx, my) == (bx - r, by):
-                return True
-    if bx == mx:
-        for r in range(raio + 1):
-            if mapa.is_stone((bx, by + r)):
-                break  # protected by stone in the bottom
-            if (mx, my) == (bx, by + r):
-                return True
-        for r in range(raio + 1):
-            if mapa.is_stone((bx, by - r)):
-                break  # protected by stone in the top
-            if (mx, my) == (bx, by - r):
-                return True
-
-    return False
+    return nwall
