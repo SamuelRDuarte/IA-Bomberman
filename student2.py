@@ -79,6 +79,14 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                     else:
                         key = goto(my_pos, wall)
 
+                # apanhar powerups e ir para o portal
+                if state['enemies'] == [] and state['walls'] == []:
+                    for powerup in state['powerups']:
+                        key = goto(my_pos, powerup[0])
+
+                    key = goto(my_pos, state['exit'])
+
+                    
                 if key != '':
                     if not key in ways:
                         key = choose_random_move(ways)
