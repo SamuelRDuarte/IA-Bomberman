@@ -28,7 +28,7 @@ def goto(origem, destino):
     return vector2dir(dx - ox, dy - oy)
 
 # para qualquer posicao retorna um lista de possoveis movimentos
-def get_possible_ways(mapa, position):  
+def get_possible_ways2(mapa, position):  
     ways = []
 
     x, y = position
@@ -40,6 +40,30 @@ def get_possible_ways(mapa, position):
     if not mapa.is_blocked([x-1, y]):
         ways.append('a')
     if not mapa.is_blocked([x, y-1]):
+        ways.append('w')
+
+    return ways
+
+def get_possible_ways(mapa, position):  
+    ways = []
+
+    x, y = position
+    tile1 = mapa.get_tile((x+1,y))
+    tile2 = mapa.get_tile((x-1,y))
+    tile3 = mapa.get_tile((x,y+1))
+    tile4 = mapa.get_tile((x,y-1))
+    print("tijolos")
+    print(tile1)
+    print(tile2)
+    print(tile3)
+    print(tile4)
+    if tile1 != 1:
+        ways.append('d')
+    if tile3 != 1:
+        ways.append('s')
+    if tile2 != 1:
+        ways.append('a')
+    if tile4 != 1:
         ways.append('w')
 
     return ways
