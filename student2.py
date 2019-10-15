@@ -30,41 +30,55 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                 key = ""
                 
                 print(state)
-
-                first_wall = state['walls'][0]                
+                
                 my_pos = state['bomberman']
 
                 ways = get_possible_ways(mapa, my_pos)
                 print('ways: ', end='')
                 print(ways)
 
-
-                key = goto(my_pos, first_wall)
-
-                if not key in ways:
-                    key = choose_random_move(ways)
-
                 # se houver bombas foge
                 if state['bombs'] != []:
                     pos_bomb, t, raio = state['bombs'][0]
+
                     sameDir = check_same_direction(pos_bomb, my_pos)
-                    print('same direction: ' + str(sameDir))
+                    print('Same direction?: ' + str(sameDir))
 
                     # so verifica se nao esta na msm direcao que a bomba
                     # falta: verificar se esta fora do raio e nao fugir de onde veio
-                    if sameDir:
-                        key = choose_random_move(ways)
+                    if dist_to(my_pos, pos_bomb) <= raio:
+                        if sameDir:
+                            print('Fugirrr')
+                            direcao_proibida = inverse(previous_key)
+                            print('Proibido: ' + str(direcao_proibida))
+                            if direcao_proibida in ways:
+                                ways.remove(direcao_proibida)
+                                key = choose_random_move(ways)
+                            else:
+                                key = choose_random_move(ways)
 
                     else: # esta seguro, espera ate a bomba rebentar
+                        print("Esperar que a bomba rebente...")
                         key = ''
 
                 else: # nao ha bombas, ve se ta perto de uma parede para por bomba
-                    if dist_to_wall(my_pos, first_wall) <= 1:
+                    print("Procurar parede...")
+                    first_wall = state['walls'][0]
+
+                    print('dist to wall: ', end='')
+                    print(dist_to(my_pos, first_wall))
+
+                    if dist_to(my_pos, first_wall) <= 1:
                         print('Cheguei à parede!')
                         key = 'B'
-                    
-                print('dist to wall: ', end='')
-                print(dist_to_wall(my_pos, first_wall))
+                        ways.append('B')
+
+                    else:
+                        key = goto(my_pos, first_wall)
+
+                if key != '':
+                    if not key in ways:
+                        key = choose_random_move(ways)
 
                 previous_key = key
                 print('Sending key: ' + key)

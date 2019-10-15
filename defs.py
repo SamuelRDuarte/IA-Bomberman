@@ -50,10 +50,10 @@ def get_possible_ways(mapa, position):
     
     if not mapa.is_blocked([x+1, y]):
         ways.append('d')
-    if not mapa.is_blocked([x-1, y]):
-        ways.append('a')
     if not mapa.is_blocked([x, y+1]):
         ways.append('s')
+    if not mapa.is_blocked([x-1, y]):
+        ways.append('a')
     if not mapa.is_blocked([x, y-1]):
         ways.append('w')
 
@@ -61,10 +61,24 @@ def get_possible_ways(mapa, position):
 
 # da lista de possiveis caminhos escolhe um caminho random
 def choose_random_move(ways):
+    if len(ways) == 1:
+        return ways[0]
+
     index = random.randint(0, len(ways)-1)
     print('index: ' + str(index))
-    print('random: ' + ways[index])
+    print('random_key: ' + ways[index])
     return ways[index]
+
+# dando uma key retorna a sua inversa
+def inverse(key):
+    if key == 'a':
+        return 'd'
+    elif key == 'd':
+        return 'a'
+    elif key == 's':
+        return 'w'
+    elif key == 'w':
+        return 's'
 
 # verifica se duas posicoes estao na msm direcao 
 def check_same_direction(pos1, pos2):
@@ -79,8 +93,8 @@ def check_same_direction(pos1, pos2):
 
     return False
 
-
-def dist_to_wall(pos1, pos2):
+# retorna distancia entre duas posiçoes
+def dist_to(pos1, pos2):
     if len(pos1) != 2 or len(pos1) != 2:
         return ''
 
@@ -90,6 +104,9 @@ def dist_to_wall(pos1, pos2):
     return math.sqrt(math.pow((x2-x1), 2) + math.pow((y2-y1), 2))
 
 
+#def next_wall(walls): 
+
+# ------------------------------------------------------------
 
 def go_hide(bomb, bomberman_pos, previous_key):
 
