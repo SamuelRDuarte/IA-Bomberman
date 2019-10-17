@@ -75,6 +75,82 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
 
 
 
+
+  ##17/10 - Fugir dos inimigos
+                        if state['enemies'] != []:
+                            ord_enemies = closer_enemies(my_pos, state['enemies'])
+                            for i in range(len(ord_enemies)):
+                                if dist_to(my_pos, ord_enemies[i][1]) < 10:
+                                    key = avoid(my_pos, ord_enemies[i][1], mapa)
+                                    break
+                                    print("FUGI\n")
+
+
+
+#Verifica o mais perto   ---> A funcionar
+def closer_enemies(my_pos,list):
+    lista1=[]
+
+    for i in range(len(list)):
+        coor=list[i]['pos']
+        lista1.append([dist_to(my_pos,list[i]['pos']),list[i]['pos']])
+
+        #Guarda uma lista de tuplos (id e distancia), ordenada por distancias
+    bubble_sort(lista1)
+
+    return lista1
+
+
+
+#evita os inimigos
+def avoid(my_pos,en_pos,mapa):
+    if en_pos[0]>my_pos[0]:                                             #Inimigo à direita
+        if not Map.is_stone(mapa,[my_pos[0]-1,my_pos[1]]):                       #BOmberman vai à esquerda
+            print("ESQUERDA")
+            return 'a'
+        else:                                                           #Pedra à esquerda
+            if en_pos[1]>my_pos[1]:                                     #Inimigo acima
+                if not Map.is_stone(mapa,[my_pos[0], my_pos[1]-1]):              #Bomberman para baixo
+                    print("BAIXO")
+                    return 's'
+                else:
+                    print("rip")
+                    return ''
+
+            else:                                                       #Inimigo abaixo
+                if not Map.is_stone(mapa,[my_pos[0], my_pos[1]+1]):              #Bomberman para cima
+                    print("CIMA")
+                    return 'w'
+                else:
+                    print("rip")
+                    return ''
+
+    else:                                                               #Inimigo à esquerda
+        if not Map.is_stone(mapa,[my_pos[0] + 1, my_pos[1]]):  # BOmberman vai à direita
+            print("DIREITA")
+            return 'd'
+        else:  # Pedra à direita
+            if en_pos[1] > my_pos[1]:  # Inimigo acima
+                if not Map.is_stone(mapa,[my_pos[0], my_pos[1] - 1]):  # Bomberman para baixo
+                    print("Baixo")
+                    return 's'
+                else:
+                    print("rip")
+                    return ''
+
+            else:  # Inimigo abaixo
+                if not Map.is_stone(mapa,[my_pos[0], my_pos[1] + 1]):  # Bomberman para cima
+                    print("CIMA")
+                    return 'w'
+                else:
+                    print("rip")
+                    return ''
+
+
+
+
+
+
 # DO NOT CHANGE THE LINES BELLOW
 # You can change the default values using the command line, example:
 # $ NAME='bombastico' python3 client.py

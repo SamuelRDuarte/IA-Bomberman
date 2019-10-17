@@ -21,6 +21,8 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
         mapa = Map(size=game_properties["size"], mapa=game_properties["map"])
         previous_key = ""
 
+
+
         while True:
             try:
                 state = json.loads(
@@ -28,7 +30,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                 )  # receive game state, this must be called timely or your game will get out of sync with the server                
                 # Next lines are only for the Human Agent, the key values are nonetheless the correct ones!
                 key = ""
-                
+
                 print(state)
                 # atualizar mapa
                 mapa._walls = state["walls"]
@@ -36,6 +38,9 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                 my_pos = state['bomberman']
 
                 ways = get_possible_ways(mapa, my_pos)
+
+
+
                 print('ways: ', end='')
                 print(ways)
 
@@ -72,6 +77,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
 
                 else: # nao ha bombas
                     if state['walls'] == [] and state['enemies'] != [] and state['powerups'] == []:
+
                         print("going to kill enemies")
                         if dist_to(my_pos, (1,1)) == 0:
                             key = 'B'
@@ -115,6 +121,14 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
 
                 previous_key = key
                 print('Sending key: ' + key)
+
+                ##17/10 - Fugir dos inimigos
+                ord_enemies = closer_enemies(my_pos, state['enemies'])
+                for i in range(len(ord_enemies)):
+                    if dist_to(my_pos, ord_enemies[i][1]) < 3:
+                        key = avoid(my_pos, ord_enemies[i][1], mapa)
+                        break
+                        print("FUGI\n")
 
                 await websocket.send(
                     json.dumps({"cmd": "key", "key": key})

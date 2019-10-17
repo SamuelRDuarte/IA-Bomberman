@@ -157,3 +157,66 @@ def next_wall(bomberman_pos, walls):
             nwall = wall
 
     return nwall
+
+
+
+#Verifica o mais perto   ---> A funcionar
+def closer_enemies(my_pos,list):
+    lista1=[]
+
+    for i in range(len(list)):
+        coor=list[i]['pos']
+        lista1.append([dist_to(my_pos,list[i]['pos']),list[i]['pos']])
+
+        #Guarda uma lista de tuplos (id e distancia), ordenada por distancias
+    lista1.sort(key=lambda x: x[0])  # ordenar por custo (distancia)
+    print (lista1)
+
+    return lista1
+
+
+
+#evita os inimigos
+def avoid(my_pos,en_pos,mapa):
+    if en_pos[0]>my_pos[0]:                                             #Inimigo à direita
+        if not Map.is_stone(mapa,[my_pos[0]-1,my_pos[1]]):                       #BOmberman vai à esquerda
+            print("ESQUERDA")
+            return 'a'
+        else:                                                           #Pedra à esquerda
+            if en_pos[1]>my_pos[1]:                                     #Inimigo acima
+                if not Map.is_stone(mapa,[my_pos[0], my_pos[1]-1]):              #Bomberman para baixo
+                    print("BAIXO")
+                    return 's'
+                else:
+                    print("rip")
+                    return ''
+
+            else:                                                       #Inimigo abaixo
+                if not Map.is_stone(mapa,[my_pos[0], my_pos[1]+1]):              #Bomberman para cima
+                    print("CIMA")
+                    return 'w'
+                else:
+                    print("rip")
+                    return ''
+
+    else:                                                               #Inimigo à esquerda
+        if not Map.is_stone(mapa,[my_pos[0] + 1, my_pos[1]]):  # BOmberman vai à direita
+            print("DIREITA")
+            return 'd'
+        else:  # Pedra à direita
+            if en_pos[1] > my_pos[1]:  # Inimigo acima
+                if not Map.is_stone(mapa,[my_pos[0], my_pos[1] - 1]):  # Bomberman para baixo
+                    print("Baixo")
+                    return 's'
+                else:
+                    print("rip")
+                    return ''
+
+            else:  # Inimigo abaixo
+                if not Map.is_stone(mapa,[my_pos[0], my_pos[1] + 1]):  # Bomberman para cima
+                    print("CIMA")
+                    return 'w'
+                else:
+                    print("rip")
+                    return ''
+
