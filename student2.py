@@ -30,6 +30,8 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                 key = ""
                 
                 print(state)
+                # atualizar mapa
+                mapa._walls = state["walls"]
                 
                 my_pos = state['bomberman']
 
@@ -44,7 +46,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                     sameDir = check_same_direction(pos_bomb, my_pos)
                     print('Same direction?: ' + str(sameDir))
 
-                    # so verifica se:
+                    # verifica se:
                     # nao esta na msm direcao que a bomba,
                     # se esta fora do raio e 
                     # nao foge de onde veio
@@ -57,27 +59,37 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                                 if direcao_proibida in ways:
                                     ways.remove(direcao_proibida)
                                 key = choose_random_move(ways)
+
                             else:
                                 key = choose_random_move(ways)
 
+                        else: # esta seguro, espera ate a bomba rebentar
+                            print("Esperar que a bomba rebente...")
+                            key = ''
                     else: # esta seguro, espera ate a bomba rebentar
                         print("Esperar que a bomba rebente...")
                         key = ''
 
-                else: # nao ha bombas, ve se ta perto de uma parede para por bomba
-                    if state['walls'] == [] and state['enemies'] !=[]:
+                else: # nao ha bombas
+                    if state['walls'] == [] and state['enemies'] != [] and state['powerups'] == []:
                         print("going to kill enemies")
                         if dist_to(my_pos, (1,1)) == 0:
                             key = 'B'
                             ways.append('B')
                         else:
-                            key = goto(my_pos,(1,1))
-                    if state['walls'] == [] and state['enemies'] ==[]:
+                            #key = goto(my_pos,(1,1))
+                            key = choose_move(my_pos, ways, [1, 1])
+
+                    # ir para 'exit'
+                    if state['walls'] == [] and state['enemies'] == [] and state['powerups'] == []:
                         print("going to exit")
-                        key = goto(my_pos,state['exit'])
-                    if state['walls'] == [] and state['powerups'] !=[]:
+                        key = goto(my_pos, state['exit'])
+
+                    # apanhar powerups
+                    if state['walls'] == [] and state['powerups'] != []:
                         print("going to powerups")
-                        key = goto(my_pos,state['powerups'][0][0])
+                        key = goto(my_pos, state['powerups'][0][0])
+
                     if state['walls'] != []:
                         print("Procurar parede...")
                         wall = next_wall(my_pos, state['walls'])
@@ -85,22 +97,21 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                         print('dist to wall: ', end='')
                         print(dist_to(my_pos, wall))
 
+                        # por bomba se tiver perto da parede
                         if dist_to(my_pos, wall) <= 1:
-                            print('Cheguei à parede!')
+                            print('Cheguei à parede! Pôr bomba!')
                             key = 'B'
-                            ways.append('B')
+                            ways.append('B')                           
 
+                        # anda até a parede
                         else:
+                            print('Andar até à parede: ' + str(wall))
                             key = goto(my_pos, wall)
-
-                 # apanhar powerups e ir para o portal
-               ''' if state['enemies'] == [] and state['walls'] == []:
-                    for powerup in state['powerups']:
-                        key = goto(my_pos, powerup[0])'''
 
                 if key != '':
                     if not key in ways:
-                        key = choose_random_move(ways)
+                        print('Caminho impossivel... escolhendo novo')
+                        key = choose_move(my_pos, ways, wall)
 
                 previous_key = key
                 print('Sending key: ' + key)

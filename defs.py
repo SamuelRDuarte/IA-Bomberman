@@ -28,23 +28,33 @@ def goto(origem, destino):
     return vector2dir(dx - ox, dy - oy)
 
 # para qualquer posicao retorna um lista de possoveis movimentos
-def get_possible_ways2(mapa, position):  
+def get_possible_ways(mapa, position):  
     ways = []
 
     x, y = position
+    '''print(mapa.map)
+    print(position)
+    print(mapa.map[x+1][y])
+    print(mapa.map[x][y+1])
+    print(mapa.map[x-1][y])
+    print(mapa.map[x][y-1])'''
     
     if not mapa.is_blocked([x+1, y]):
+        
         ways.append('d')
     if not mapa.is_blocked([x, y+1]):
+        
         ways.append('s')
     if not mapa.is_blocked([x-1, y]):
         ways.append('a')
+        
     if not mapa.is_blocked([x, y-1]):
+        
         ways.append('w')
 
     return ways
 
-def get_possible_ways(mapa, position):  
+def get_possible_ways2(mapa, position):  
     ways = []
 
     x, y = position
@@ -72,6 +82,32 @@ def get_possible_ways(mapa, position):
 def choose_random_move(ways):
     if len(ways) != []:
         return random.choice(ways)
+
+def choose_move(my_pos, ways, goal):
+    if len(ways) == 0:
+        return ''
+
+    mx, my = my_pos
+    
+    custo_min = []
+
+    if 'a' in ways:
+        custo_min.append(('a', dist_to([mx-1, my], goal)))        
+    if 's' in ways:
+        custo_min.append(('s', dist_to([mx, my+1], goal)))
+    if 'd' in ways:
+        custo_min.append(('d', dist_to([mx+1, my], goal)))
+    if 'w' in ways:
+        custo_min.append(('w', dist_to([mx, my-1], goal)))
+
+
+    print('lista antes de ordendar: ' + str(custo_min))
+    custo_min.sort(key= lambda x: x[1]) # ordenar por custo (distancia)
+
+    print('lista depois de ordendar: ' + str(custo_min))
+
+    return custo_min[0][0]
+               
 
 # dando uma key retorna a sua inversa
 def inverse(key):
