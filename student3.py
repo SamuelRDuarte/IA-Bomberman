@@ -19,8 +19,8 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
 
         # You can create your own map representation or use the game representation:
         mapa = Map(size=game_properties["size"], mapa=game_properties["map"])
-        previous_key = ""
-
+        calc_hide_pos = False
+        goal = 0,0
 
 
         while True:
@@ -33,49 +33,32 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
 
                 print(state)
                 # atualizar mapa
-                mapa._walls = state["walls"]
-                
+                mapa._walls = state['walls']
                 my_pos = state['bomberman']
-
+                
                 ways = get_possible_ways(mapa, my_pos)
-
-
-
                 print('ways: ', end='')
                 print(ways)
 
-                # se houver bombas foge
-                if state['bombs'] != []:
-                    pos_bomb, t, raio = state['bombs'][0]
+                
+                if state['bombs'] != [] and not calc_hide_pos:
+                    print("calcurar hide pos")
+                    goal = choose_hide_pos(my_pos,state['bombs'][0],state['enemies'],mapa,[0,0])
+                    print('my pos:',my_pos)
+                    print(goal)
+                    calc_hide_pos = True
+                    key = goto(my_pos,goal)
+                
+                if state['bombs'] != [] and calc_hide_pos:
+                    if dist_to(my_pos,goal) != 0:
+                        print("ir para hide pos")
+                        key = goto(my_pos,goal)
 
-                    sameDir = check_same_direction(pos_bomb, my_pos)
-                    print('Same direction?: ' + str(sameDir))
-
-                    # verifica se:
-                    # nao esta na msm direcao que a bomba,
-                    # se esta fora do raio e 
-                    # nao foge de onde veio
-                    if dist_to(my_pos, pos_bomb) <= raio:
-                        if sameDir:
-                            print('Fugirrr')
-                            if dist_to(my_pos, pos_bomb) >= 1:
-                                direcao_proibida = inverse(previous_key)
-                                print('Proibido: ' + str(direcao_proibida))
-                                if direcao_proibida in ways:
-                                    ways.remove(direcao_proibida)
-                                key = choose_random_move(ways)
-
-                            else:
-                                key = choose_random_move(ways)
-
-                        else: # esta seguro, espera ate a bomba rebentar
-                            print("Esperar que a bomba rebente...")
-                            key = ''
                     else: # esta seguro, espera ate a bomba rebentar
                         print("Esperar que a bomba rebente...")
                         key = ''
-
                 else: # nao ha bombas
+                    calc_hide_pos = False
                     if state['walls'] == [] and state['enemies'] != [] and state['powerups'] == []:
 
                         print("going to kill enemies")
@@ -83,41 +66,45 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                             key = 'B'
                             ways.append('B')
                         else:
-                            #key = goto(my_pos,(1,1))
-                            key = choose_move(my_pos, ways, [1, 1])
+                            goal = 1,1
+                            key = goto(my_pos,goal)
+                            #key = choose_move(my_pos, ways, [1, 1])
 
                     # ir para 'exit'
                     if state['walls'] == [] and state['enemies'] == [] and state['powerups'] == []:
                         print("going to exit")
-                        key = goto(my_pos, state['exit'])
+                        goal = state['exit']
+                        key = goto(my_pos, goal)
 
                     # apanhar powerups
                     if state['walls'] == [] and state['powerups'] != []:
                         print("going to powerups")
-                        key = goto(my_pos, state['powerups'][0][0])
+                        goal = state['powerups'][0][0]
+                        key = goto(my_pos,goal )
 
                     if state['walls'] != []:
                         print("Procurar parede...")
-                        wall = next_wall(my_pos, state['walls'])
+                        goal = next_wall(my_pos, state['walls'])
 
                         print('dist to wall: ', end='')
-                        print(dist_to(my_pos, wall))
+                        print(dist_to(my_pos, goal))
 
                         # por bomba se tiver perto da parede
-                        if dist_to(my_pos, wall) <= 1:
+                        if dist_to(my_pos, goal) <= 1:
                             print('Cheguei à parede! Pôr bomba!')
                             key = 'B'
                             ways.append('B')                           
 
                         # anda até a parede
                         else:
-                            print('Andar até à parede: ' + str(wall))
-                            key = goto(my_pos, wall)
+                            print('Andar até à parede: ' + str(goal))
+                            key = goto(my_pos, goal)
+
 
                 if key != '':
                     if not key in ways:
                         print('Caminho impossivel... escolhendo novo')
-                        key = choose_move(my_pos, ways, wall)
+                        key = choose_move(my_pos, ways, goal)
 
                 previous_key = key
                 print('Sending key: ' + key)
