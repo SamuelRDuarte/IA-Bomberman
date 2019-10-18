@@ -119,16 +119,18 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                         print('Caminho impossivel... escolhendo novo')
                         key = choose_move(my_pos, ways, wall)
 
-                previous_key = key
-                print('Sending key: ' + key)
+
 
                 ##17/10 - Fugir dos inimigos
                 ord_enemies = closer_enemies(my_pos, state['enemies'])
-                for i in range(len(ord_enemies)):
-                    if dist_to(my_pos, ord_enemies[i][1]) < 3:
-                        key = avoid(my_pos, ord_enemies[i][1], mapa)
-                        break
-                        print("FUGI\n")
+                if dist_to(my_pos, ord_enemies[0][1]) < 3:
+                    key = avoid(my_pos, ord_enemies[0][1], mapa)
+                    print("FUGI\n")
+
+
+
+                previous_key = key
+                print('Sending key: ' + key)
 
                 await websocket.send(
                     json.dumps({"cmd": "key", "key": key})

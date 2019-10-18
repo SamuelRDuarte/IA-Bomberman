@@ -178,45 +178,100 @@ def closer_enemies(my_pos,list):
 
 #evita os inimigos
 def avoid(my_pos,en_pos,mapa):
+
+    # if en_pos[0] == my_pos[0]:
+    #     if not Map.is_blocked(mapa, [my_pos[0], my_pos[1] - 1]):  # Bomberman para baixo
+    #         print("BAIXO")
+    #         return 's'
+    #     else:
+    #         print("CIMA")
+    #         return 'w'
+    #
+    # elif en_pos[1]==mu
+
+
     if en_pos[0]>my_pos[0]:                                             #Inimigo à direita
-        if not Map.is_stone(mapa,[my_pos[0]-1,my_pos[1]]):                       #BOmberman vai à esquerda
+        if not Map.is_blocked(mapa,[my_pos[0]-1,my_pos[1]]):                       #BOmberman vai à esquerda
             print("ESQUERDA")
             return 'a'
         else:                                                           #Pedra à esquerda
-            if en_pos[1]>my_pos[1]:                                     #Inimigo acima
-                if not Map.is_stone(mapa,[my_pos[0], my_pos[1]-1]):              #Bomberman para baixo
+            if en_pos[1]>my_pos[1]:                                     #Inimigo abaixo
+                if not Map.is_blocked(mapa,[my_pos[0], my_pos[1]-1]):              #Bomberman para cima
+                    print("CIMA")
+                    return 'w'
+            elif en_pos[1] < my_pos[1]:  # Inimigo acima
+                if not Map.is_blocked(mapa, [my_pos[0], my_pos[1] + 1]):  # Bomberman para baixo
+                    print("BAIXO")
+                    return 's'
+                else:
+                    print("rip")
+
+            else:                                                       # INIMIGO NO MESMO NIVEL
+                if not Map.is_blocked(mapa, [my_pos[0], my_pos[1] - 1]):  # Bomberman para cima
+                    print("CIMA")
+                    return 'w'
+                else:
+                    print("BAIXO")
+                    return 's'
+
+
+    elif en_pos[0]<my_pos[0]:                                                               #Inimigo à esquerda
+        if not Map.is_blocked(mapa,[my_pos[0] + 1, my_pos[1]]):  # BOmberman vai à direita
+            print("DIREITA")
+            return 'd'
+        else:                                                   # Pedra à direita
+            if en_pos[1] > my_pos[1]:  # Inimigo abaixo
+                if not Map.is_blocked(mapa,[my_pos[0], my_pos[1] - 1]):  # Bomberman para cima
+                    print("CIMA")
+                    return 'w'
+                else:
+                    print("rip")
+                    return ''
+
+            elif en_pos[1] < my_pos[1]:
+                if not Map.is_blocked(mapa,[my_pos[0], my_pos[1] + 1]):  # Bomberman para baixo
                     print("BAIXO")
                     return 's'
                 else:
                     print("rip")
                     return ''
 
-            else:                                                       #Inimigo abaixo
-                if not Map.is_stone(mapa,[my_pos[0], my_pos[1]+1]):              #Bomberman para cima
+
+            else:  # Inimigo NO MESMO NIVEL
+                if not Map.is_blocked(mapa,[my_pos[0], my_pos[1] - 1]):  # Bomberman para cima
                     print("CIMA")
                     return 'w'
                 else:
-                    print("rip")
-                    return ''
-
-    else:                                                               #Inimigo à esquerda
-        if not Map.is_stone(mapa,[my_pos[0] + 1, my_pos[1]]):  # BOmberman vai à direita
-            print("DIREITA")
-            return 'd'
-        else:  # Pedra à direita
-            if en_pos[1] > my_pos[1]:  # Inimigo acima
-                if not Map.is_stone(mapa,[my_pos[0], my_pos[1] - 1]):  # Bomberman para baixo
-                    print("Baixo")
+                    print("BAIXO")
                     return 's'
-                else:
-                    print("rip")
-                    return ''
 
-            else:  # Inimigo abaixo
-                if not Map.is_stone(mapa,[my_pos[0], my_pos[1] + 1]):  # Bomberman para cima
-                    print("CIMA")
-                    return 'w'
-                else:
-                    print("rip")
-                    return ''
+
+    else:                                                               #INIMIGO EM LINHA
+        if en_pos[1] > my_pos[1]:  # Inimigo acima
+            if not Map.is_blocked(mapa, [my_pos[0], my_pos[1] - 1]):  # Bomberman para cima
+                print("CIMA")
+                return 'w'
+            else:
+                print("rip")
+                return ''
+
+        elif en_pos[1] < my_pos[1]:
+            if not Map.is_blocked(mapa, [my_pos[0], my_pos[1] +  1]):  # Bomberman para baixo
+                print("BAIXO")
+                return 's'
+            else:
+                print("rip")
+                return ''
+
+
+        else:  # Inimigo NO MESMO NIVEL
+            if not Map.is_blocked(mapa, [my_pos[0], my_pos[1] - 1]):  # Bomberman para cima
+                print("CIMA")
+                return 'w'
+            else:
+                print("BAIXO")
+                return 's'
+
+
+
 
