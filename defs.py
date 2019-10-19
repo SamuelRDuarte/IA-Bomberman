@@ -62,11 +62,6 @@ def get_possible_ways2(mapa, position):
     tile2 = mapa.get_tile((x-1,y))
     tile3 = mapa.get_tile((x,y+1))
     tile4 = mapa.get_tile((x,y-1))
-    print("tijolos")
-    print(tile1)
-    print(tile2)
-    print(tile3)
-    print(tile4)
     if tile1 != 1:
         ways.append('d')
     if tile3 != 1:
@@ -101,10 +96,10 @@ def choose_move(my_pos, ways, goal):
         custo_min.append(('w', dist_to([mx, my-1], goal)))
 
 
-    print('lista antes de ordendar: ' + str(custo_min))
+    
     custo_min.sort(key= lambda x: x[1]) # ordenar por custo (distancia)
 
-    print('lista depois de ordendar: ' + str(custo_min))
+
 
     return custo_min[0][0]
                
@@ -158,6 +153,63 @@ def next_wall(bomberman_pos, walls):
 
     return nwall
 
+def in_range(bomberman_pos,raio,obstaculo,mapa):
+    cx,cy = bomberman_pos
+    bx,by = obstaculo
+    
+    if by == cy:
+        for r in range(raio + 1):
+            if mapa.is_stone((bx + r, by)):
+                break  # protected by stone to the right
+            if (cx, cy) == (bx + r, by):
+                return True
+        for r in range(raio + 1):
+            if mapa.is_stone((bx - r, by)):
+                break  # protected by stone to the left 
+            if (cx, cy) == (bx - r, by):
+                return True
+    if bx == cx:
+        for r in range(raio + 1):
+            if mapa.is_stone((bx, by + r)):
+                break  # protected by stone in the bottom
+            if (cx, cy) == (bx, by + r):
+                return True
+        for r in range(raio + 1):
+            if mapa.is_stone((bx, by - r)):
+                break  # protected by stone in the top
+            if (cx, cy) == (bx, by - r):
+                return True
+    return False
+
+
+def enemie_close(bomberman_pos,enimies,mapa):
+    for eni in enimies:
+        if in_range(bomberman_pos,2,eni['pos'],mapa):
+            return True
+    return False
+    
+
+def choose_hide_pos(bomberman_pos,bomb,enemies,mapa,previous_pos):
+    x,y = bomberman_pos
+    if not in_range(bomberman_pos,bomb[2],bomb[0],mapa) and not enemie_close(bomberman_pos,enemies,mapa):
+        return bomberman_pos
+    print("checking baixo")
+    if [x,y+1] != previous_pos and not mapa.is_blocked([x,y+1]) and not enemie_close([x,y+1],enemies,mapa):
+        print("resultou baixo")
+        return choose_hide_pos([x,y+1],bomb,enemies,mapa,bomberman_pos)
+    print("checking direita")
+    if [x+1,y] != previous_pos and not mapa.is_blocked([x+1,y]) and not enemie_close([x+1,y],enemies,mapa):
+        print("resultou direita")
+        return choose_hide_pos([x+1,y],bomb,enemies,mapa,bomberman_pos) 
+    print("checking esquerda")
+    if [x-1,y] != previous_pos and not mapa.is_blocked([x-1,y]) and not enemie_close([x-1,y],enemies,mapa):
+        print("resultou esquerda")
+        return choose_hide_pos([x-1,y],bomb,enemies,mapa,bomberman_pos)
+    print("checking cima")
+    if [x,y-1] != previous_pos and not mapa.is_blocked([x,y-1]) and not enemie_close([x,y-1],enemies,mapa):
+        print("resultou cima")
+        return choose_hide_pos([x,y-1],bomb,enemies,mapa,bomberman_pos)
+        
 
 
 #Verifica o mais perto   ---> A funcionar
