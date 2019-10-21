@@ -28,16 +28,19 @@ def goto(origem, destino):
     return vector2dir(dx - ox, dy - oy)
 
 # para qualquer posicao retorna um lista de possoveis movimentos
-def get_possible_ways(mapa, position):  
+def get_possible_ways2(mapa, position):  
     ways = []
 
     x, y = position
-    '''print(mapa.map)
+    #print(mapa.map)
     print(position)
     print(mapa.map[x+1][y])
     print(mapa.map[x][y+1])
     print(mapa.map[x-1][y])
-    print(mapa.map[x][y-1])'''
+    print(mapa.map[x][y-1])
+
+    print((x, y+1) in mapa._walls)
+    print([x, y+1] in mapa._walls)
     
     if not mapa.is_blocked([x+1, y]):
         
@@ -54,7 +57,7 @@ def get_possible_ways(mapa, position):
 
     return ways
 
-def get_possible_ways2(mapa, position):  
+def get_possible_ways(mapa, position):  
     ways = []
 
     x, y = position
@@ -62,13 +65,13 @@ def get_possible_ways2(mapa, position):
     tile2 = mapa.get_tile((x-1,y))
     tile3 = mapa.get_tile((x,y+1))
     tile4 = mapa.get_tile((x,y-1))
-    if tile1 != 1:
+    if tile1 != 1 and tile1 != 2:
         ways.append('d')
-    if tile3 != 1:
+    if tile3 != 1 and tile3 != 2:
         ways.append('s')
-    if tile2 != 1:
+    if tile2 != 1 and tile2 != 2:
         ways.append('a')
-    if tile4 != 1:
+    if tile4 != 1 and tile4 != 2:
         ways.append('w')
 
     return ways
@@ -95,11 +98,7 @@ def choose_move(my_pos, ways, goal):
     if 'w' in ways:
         custo_min.append(('w', dist_to([mx, my-1], goal)))
 
-
-    
     custo_min.sort(key= lambda x: x[1]) # ordenar por custo (distancia)
-
-
 
     return custo_min[0][0]
                
@@ -189,28 +188,77 @@ def enemie_close(bomberman_pos,enimies,mapa):
     return False
     
 
-def choose_hide_pos(bomberman_pos,bomb,enemies,mapa,previous_pos):
+def choose_hide_pos(bomberman_pos, bomb, enemies, mapa, previous_pos):
     x,y = bomberman_pos
-    if not in_range(bomberman_pos,bomb[2],bomb[0],mapa) and not enemie_close(bomberman_pos,enemies,mapa):
+
+    if not in_range(bomberman_pos, bomb[2], bomb[0], mapa) and not enemie_close(bomberman_pos, enemies, mapa):
+        print("Posicao segura!")
         return bomberman_pos
+    
     print("checking baixo")
     if [x,y+1] != previous_pos and not mapa.is_blocked([x,y+1]) and not enemie_close([x,y+1],enemies,mapa):
         print("resultou baixo")
         return choose_hide_pos([x,y+1],bomb,enemies,mapa,bomberman_pos)
     print("checking direita")
+
     if [x+1,y] != previous_pos and not mapa.is_blocked([x+1,y]) and not enemie_close([x+1,y],enemies,mapa):
         print("resultou direita")
         return choose_hide_pos([x+1,y],bomb,enemies,mapa,bomberman_pos) 
     print("checking esquerda")
+
     if [x-1,y] != previous_pos and not mapa.is_blocked([x-1,y]) and not enemie_close([x-1,y],enemies,mapa):
         print("resultou esquerda")
         return choose_hide_pos([x-1,y],bomb,enemies,mapa,bomberman_pos)
     print("checking cima")
+
     if [x,y-1] != previous_pos and not mapa.is_blocked([x,y-1]) and not enemie_close([x,y-1],enemies,mapa):
         print("resultou cima")
         return choose_hide_pos([x,y-1],bomb,enemies,mapa,bomberman_pos)
-        
 
+
+def choose_hide_pos2(bomberman_pos, bomb, mapa, previous_key):
+    x,y = bomberman_pos
+
+
+    if not in_range(bomberman_pos, bomb[2], bomb[0], mapa):
+        print("Posicao segura!")
+        return bomberman_pos
+
+    ways = get_possible_ways(mapa, bomberman_pos)
+    #print(repr(mapa.map))
+    print("DEBUG: ways: " + repr(ways) + ", prev: " + previous_key)
+
+    if previous_key in ['a', 'd']: # andou para o lado, experimenta para o cima/baixo
+        if 'w' in ways:
+            return choose_hide_pos2([x,y-1], bomb, mapa, 'w')
+        if 's' in ways:
+            return choose_hide_pos2([x,y+1], bomb, mapa, 's')
+
+    if previous_key in ['w', 's']: # andou na vertical, experimenta para os lados
+        if 'a' in ways:
+            return choose_hide_pos2([x-1,y], bomb, mapa, 'a')
+        if 'd' in ways:
+            return choose_hide_pos2([x+1,y], bomb, mapa, 'd')
+    
+    print("checking baixo")
+    if 's' in ways:
+        print("resultou baixo")
+        return choose_hide_pos2([x,y+1], bomb, mapa, 's')
+    print("checking direita")
+
+    if 'd' in ways:
+        print("resultou direita")
+        return choose_hide_pos2([x+1,y], bomb, mapa, 'd') 
+    print("checking esquerda")
+
+    if 'a' in ways:
+        print("resultou esquerda")
+        return choose_hide_pos2([x-1,y], bomb, mapa, 'a')
+    print("checking cima")
+
+    if 'w' in ways:
+        print("resultou cima")
+        return choose_hide_pos2([x,y-1], bomb, mapa, 'w')
 
 #Verifica o mais perto   ---> A funcionar
 def closer_enemies(my_pos,list):

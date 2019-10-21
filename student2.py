@@ -21,7 +21,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
         mapa = Map(size=game_properties["size"], mapa=game_properties["map"])
         previous_key = ""
 
-
+        calc_hide_pos = False
 
         while True:
             try:
@@ -43,7 +43,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
 
                 print('ways: ', end='')
                 print(ways)
-
+                '''
                 # se houver bombas foge
                 if state['bombs'] != []:
                     pos_bomb, t, raio = state['bombs'][0]
@@ -51,10 +51,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                     sameDir = check_same_direction(pos_bomb, my_pos)
                     print('Same direction?: ' + str(sameDir))
 
-                    # verifica se:
-                    # nao esta na msm direcao que a bomba,
-                    # se esta fora do raio e 
-                    # nao foge de onde veio
+                    
                     if dist_to(my_pos, pos_bomb) <= raio:
                         if sameDir:
                             print('Fugirrr')
@@ -75,7 +72,28 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                         print("Esperar que a bomba rebente...")
                         key = ''
 
+                    '''
+                # fuga recursiva
+                if state['bombs'] != [] and not calc_hide_pos:
+                    print("calcurar hide pos")
+                    #goal = choose_hide_pos(my_pos,state['bombs'][0],state['enemies'],mapa,[0,0])
+                    goal = choose_hide_pos2(my_pos, state['bombs'][0], mapa, '')
+                    print('my pos:',my_pos)
+                    print(goal)
+                    calc_hide_pos = True
+                    key = goto(my_pos,goal)
+                
+                if state['bombs'] != [] and calc_hide_pos:
+                    if dist_to(my_pos,goal) != 0:
+                        print("ir para hide pos")
+                        key = goto(my_pos,goal)
+
+                    else: # esta seguro, espera ate a bomba rebentar
+                        print("Esperar que a bomba rebente...")
+                        key = ''
+
                 else: # nao ha bombas
+                    calc_hide_pos = False
                     if state['walls'] == [] and state['enemies'] != [] and state['powerups'] == []:
 
                         print("going to kill enemies")

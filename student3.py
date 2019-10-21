@@ -32,18 +32,20 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                 key = ""
 
                 print(state)
+                
+                my_pos = state['bomberman']
+
                 # atualizar mapa
                 mapa._walls = state['walls']
-                my_pos = state['bomberman']
-                
                 ways = get_possible_ways(mapa, my_pos)
                 print('ways: ', end='')
                 print(ways)
-
+                
                 
                 if state['bombs'] != [] and not calc_hide_pos:
                     print("calcurar hide pos")
-                    goal = choose_hide_pos(my_pos,state['bombs'][0],state['enemies'],mapa,[0,0])
+                    #goal = choose_hide_pos(my_pos,state['bombs'][0],state['enemies'],mapa,[0,0])
+                    goal = choose_hide_pos2(my_pos, state['bombs'][0], mapa, '')
                     print('my pos:',my_pos)
                     print(goal)
                     calc_hide_pos = True
@@ -58,6 +60,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                         print("Esperar que a bomba rebente...")
                         key = ''
                 else: # nao ha bombas
+
                     calc_hide_pos = False
                     if state['walls'] == [] and state['enemies'] != [] and state['powerups'] == []:
 
