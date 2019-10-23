@@ -34,10 +34,8 @@ def get_possible_ways2(mapa, position):
     x, y = position
     #print(mapa.map)
     print(position)
-    print(mapa.map[x+1][y])
-    print(mapa.map[x][y+1])
-    print(mapa.map[x-1][y])
-    print(mapa.map[x][y-1])
+    print('direita: ' + str(mapa.map[x + 1][y]) + ' baixo: ' + str(mapa.map[x][y + 1]) + ' esquerda: ' + str(
+        mapa.map[x - 1][y]) + ' cima: ' + str(mapa.map[x][y - 1]))
 
     print((x, y+1) in mapa._walls)
     print([x, y+1] in mapa._walls)
@@ -61,8 +59,10 @@ def get_possible_ways(mapa, position):
     ways = []
 
     x, y = position
-    tile1 = mapa.get_tile((x+1,y))
-    tile2 = mapa.get_tile((x-1,y))
+    print('direita:'+str(mapa.map[x+1][y])+'baixo:'+str(mapa.map[x][y+1])+'esquerda:'+str(mapa.map[x-1][y])+'cima:'+str(mapa.map[x][y-1]))
+    
+    tile1 = mapa.map[x+1][y]
+    tile2 = mapa.map[x-1][y]
     tile3 = mapa.get_tile((x,y+1))
     tile4 = mapa.get_tile((x,y-1))
     if tile1 != 1 and tile1 != 2:
@@ -216,7 +216,7 @@ def choose_hide_pos(bomberman_pos, bomb, enemies, mapa, previous_pos):
         return choose_hide_pos([x,y-1],bomb,enemies,mapa,bomberman_pos)
 
 
-def choose_hide_pos2(bomberman_pos, bomb, mapa, previous_key):
+def choose_hide_pos2(bomberman_pos, bomb, mapa, previous_key,n):
     x,y = bomberman_pos
 
 
@@ -229,36 +229,44 @@ def choose_hide_pos2(bomberman_pos, bomb, mapa, previous_key):
     print("DEBUG: ways: " + repr(ways) + ", prev: " + previous_key)
 
     if previous_key in ['a', 'd']: # andou para o lado, experimenta para o cima/baixo
-        if 'w' in ways:
-            return choose_hide_pos2([x,y-1], bomb, mapa, 'w')
+        print("andou para lado ckecking baixo")
         if 's' in ways:
+            print("andou para lado resultou baixo")           
             return choose_hide_pos2([x,y+1], bomb, mapa, 's')
+        print("andou para lado ckecking cima")
+        if 'w' in ways:
+            print("andou para lado resultou cima")
+            return choose_hide_pos2([x, y - 1], bomb, mapa, 'w')
 
     if previous_key in ['w', 's']: # andou na vertical, experimenta para os lados
-        if 'a' in ways:
-            return choose_hide_pos2([x-1,y], bomb, mapa, 'a')
+        print("andou na vertical  ckecking direita")
         if 'd' in ways:
-            return choose_hide_pos2([x+1,y], bomb, mapa, 'd')
-    
+            print("andou na vertical  resultou direita")
+            return choose_hide_pos2([x + 1, y], bomb, mapa, 'd')
+        print("andou na vertical  ckecking esquerda")
+        if 'a' in ways:
+            print("andou na vertical resultou esquerda")
+            return choose_hide_pos2([x-1,y], bomb, mapa, 'a')
+
     print("checking baixo")
     if 's' in ways:
         print("resultou baixo")
-        return choose_hide_pos2([x,y+1], bomb, mapa, 's')
-    print("checking direita")
+        return choose_hide_pos2([x, y + 1], bomb, mapa, 's')
+    print("checking cima")
+    if 'w' in ways:
+        print("resultou cima")
+        return choose_hide_pos2([x, y - 1], bomb, mapa, 'w')
 
+    print("checking direita")
     if 'd' in ways:
         print("resultou direita")
-        return choose_hide_pos2([x+1,y], bomb, mapa, 'd') 
+        return choose_hide_pos2([x + 1, y], bomb, mapa, 'd')
     print("checking esquerda")
-
     if 'a' in ways:
         print("resultou esquerda")
         return choose_hide_pos2([x-1,y], bomb, mapa, 'a')
-    print("checking cima")
 
-    if 'w' in ways:
-        print("resultou cima")
-        return choose_hide_pos2([x,y-1], bomb, mapa, 'w')
+
 
 #Verifica o mais perto   ---> A funcionar
 def closer_enemies(my_pos,list):
@@ -270,7 +278,7 @@ def closer_enemies(my_pos,list):
 
         #Guarda uma lista de tuplos (id e distancia), ordenada por distancias
     lista1.sort(key=lambda x: x[0])  # ordenar por custo (distancia)
-    print (lista1)
+    #print (lista1)
 
     return lista1
 

@@ -33,11 +33,10 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
 
                 print(state)
                 # atualizar mapa
-                mapa._walls = state["walls"]
+                mapa._walls = state['walls']
                 
                 my_pos = state['bomberman']
-
-                ways = get_possible_ways(mapa, my_pos)
+                ways = get_possible_ways2(mapa, my_pos)
 
 
 
@@ -77,16 +76,19 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                 if state['bombs'] != [] and not calc_hide_pos:
                     print("calcurar hide pos")
                     #goal = choose_hide_pos(my_pos,state['bombs'][0],state['enemies'],mapa,[0,0])
+                    mapa._walls = state['walls']
                     goal = choose_hide_pos2(my_pos, state['bombs'][0], mapa, '')
                     print('my pos:',my_pos)
                     print(goal)
                     calc_hide_pos = True
-                    key = goto(my_pos,goal)
-                
+                    key = choose_move(my_pos,ways,goal)
+                    print('key hide pos in cacl:',key)
+
                 if state['bombs'] != [] and calc_hide_pos:
                     if dist_to(my_pos,goal) != 0:
                         print("ir para hide pos")
-                        key = goto(my_pos,goal)
+                        key = choose_move(my_pos,ways,goal)
+                        print('key hide pos :',key)
 
                     else: # esta seguro, espera ate a bomba rebentar
                         print("Esperar que a bomba rebente...")
@@ -107,14 +109,14 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                     # ir para 'exit'
                     if state['walls'] == [] and state['enemies'] == [] and state['powerups'] == []:
                         print("going to exit")
-                        key = goto(my_pos, state['exit'])
+                        key = choose_move(my_pos,ways,state['exit'])
 
                     # apanhar powerups
-                    if state['walls'] == [] and state['powerups'] != []:
+                    if state['powerups'] != []:
                         print("going to powerups")
-                        key = goto(my_pos, state['powerups'][0][0])
+                        key = choose_move(my_pos,ways,state['powerups'][0][0])
 
-                    if state['walls'] != []:
+                    if state['walls'] != [] and state['powerups'] == []:
                         print("Procurar parede...")
                         wall = next_wall(my_pos, state['walls'])
 
@@ -140,10 +142,11 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
 
 
                 ##17/10 - Fugir dos inimigos
-                ord_enemies = closer_enemies(my_pos, state['enemies'])
-                if dist_to(my_pos, ord_enemies[0][1]) < 3:
-                    key = avoid(my_pos, ord_enemies[0][1], mapa)
-                    print("FUGI\n")
+                if state['enemies'] !=[] and state['bombs'] ==[]:
+                    ord_enemies = closer_enemies(my_pos, state['enemies'])
+                    if dist_to(my_pos, ord_enemies[0][1]) < 3:
+                        key = avoid(my_pos, ord_enemies[0][1], mapa)
+                        #print("FUGI\n")
 
 
 
