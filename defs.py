@@ -65,6 +65,7 @@ def get_possible_ways(mapa, position):
     tile2 = mapa.map[x-1][y]
     tile3 = mapa.get_tile((x,y+1))
     tile4 = mapa.get_tile((x,y-1))
+
     if tile1 != 1 and not [x+1,y] in mapa._walls:
         ways.append('d')
     if tile3 != 1 and not [x,y+1] in mapa._walls:
@@ -216,12 +217,24 @@ def choose_hide_pos(bomberman_pos, bomb, enemies, mapa, previous_pos):
         return choose_hide_pos([x,y-1],bomb,enemies,mapa,bomberman_pos)
 
 
-def choose_hide_pos2(bomberman_pos, bomb, mapa, previous_key):
+def choose_hide_pos2(bomberman_pos, bomb, mapa, previous_key, n, limit):
     x,y = bomberman_pos
+
+    print('limite: ' + str(limit))
+    print('n: ' + str(n))
+
 
     if not in_range(bomberman_pos, bomb[2], bomb[0], mapa):
         print("Posicao segura!")
-        return bomberman_pos
+        return (bomberman_pos, True)
+
+    if n == limit:
+        print('\n\n\n\nLimite recursivo...')
+        if bomberman_pos != bomb:
+            print('Posicao encontrada nao é segura!')
+            return (bomberman_pos, False)
+        else:
+            return ([1,1], False)
 
     ways = get_possible_ways(mapa, bomberman_pos)
     #print(repr(mapa.map))
@@ -231,39 +244,39 @@ def choose_hide_pos2(bomberman_pos, bomb, mapa, previous_key):
         print("andou para lado ckecking baixo")
         if 's' in ways:
             print("andou para lado resultou baixo")           
-            return choose_hide_pos2([x,y+1], bomb, mapa, 's')
+            return choose_hide_pos2([x,y+1], bomb, mapa, 's', n+1, limit)
         print("andou para lado ckecking cima")
         if 'w' in ways:
             print("andou para lado resultou cima")
-            return choose_hide_pos2([x, y - 1], bomb, mapa, 'w')
+            return choose_hide_pos2([x, y - 1], bomb, mapa, 'w', n+1, limit)
 
     if previous_key in ['w', 's']: # andou na vertical, experimenta para os lados
         print("andou na vertical  ckecking direita")
         if 'd' in ways:
             print("andou na vertical  resultou direita")
-            return choose_hide_pos2([x + 1, y], bomb, mapa, 'd')
+            return choose_hide_pos2([x + 1, y], bomb, mapa, 'd', n+1, limit)
         print("andou na vertical  ckecking esquerda")
         if 'a' in ways:
             print("andou na vertical resultou esquerda")
-            return choose_hide_pos2([x-1,y], bomb, mapa, 'a')
+            return choose_hide_pos2([x-1,y], bomb, mapa, 'a', n+1, limit)
 
     print("checking baixo")
     if 's' in ways:
         print("resultou baixo")
-        return choose_hide_pos2([x, y + 1], bomb, mapa, 's')
+        return choose_hide_pos2([x, y + 1], bomb, mapa, 's', n+1, limit)
     print("checking cima")
     if 'w' in ways:
         print("resultou cima")
-        return choose_hide_pos2([x, y - 1], bomb, mapa, 'w')
+        return choose_hide_pos2([x, y - 1], bomb, mapa, 'w', n+1, limit)
 
     print("checking direita")
     if 'd' in ways:
         print("resultou direita")
-        return choose_hide_pos2([x + 1, y], bomb, mapa, 'd')
+        return choose_hide_pos2([x + 1, y], bomb, mapa, 'd', n+1, limit)
     print("checking esquerda")
     if 'a' in ways:
         print("resultou esquerda")
-        return choose_hide_pos2([x-1,y], bomb, mapa, 'a')
+        return choose_hide_pos2([x-1,y], bomb, mapa, 'a', n+1, limit)
 
 
 
