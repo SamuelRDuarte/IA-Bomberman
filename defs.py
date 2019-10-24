@@ -189,35 +189,7 @@ def enemie_close(bomberman_pos,enimies,mapa):
     return False
     
 
-def choose_hide_pos(bomberman_pos, bomb, enemies, mapa, previous_pos):
-    x,y = bomberman_pos
-
-    if not in_range(bomberman_pos, bomb[2], bomb[0], mapa) and not enemie_close(bomberman_pos, enemies, mapa):
-        print("Posicao segura!")
-        return bomberman_pos
-    
-    print("checking baixo")
-    if [x,y+1] != previous_pos and not mapa.is_blocked([x,y+1]) and not enemie_close([x,y+1],enemies,mapa):
-        print("resultou baixo")
-        return choose_hide_pos([x,y+1],bomb,enemies,mapa,bomberman_pos)
-    print("checking direita")
-
-    if [x+1,y] != previous_pos and not mapa.is_blocked([x+1,y]) and not enemie_close([x+1,y],enemies,mapa):
-        print("resultou direita")
-        return choose_hide_pos([x+1,y],bomb,enemies,mapa,bomberman_pos) 
-    print("checking esquerda")
-
-    if [x-1,y] != previous_pos and not mapa.is_blocked([x-1,y]) and not enemie_close([x-1,y],enemies,mapa):
-        print("resultou esquerda")
-        return choose_hide_pos([x-1,y],bomb,enemies,mapa,bomberman_pos)
-    print("checking cima")
-
-    if [x,y-1] != previous_pos and not mapa.is_blocked([x,y-1]) and not enemie_close([x,y-1],enemies,mapa):
-        print("resultou cima")
-        return choose_hide_pos([x,y-1],bomb,enemies,mapa,bomberman_pos)
-
-
-def choose_hide_pos2(bomberman_pos, bomb, mapa, previous_key, n, limit):
+def choose_hide_pos(bomberman_pos, bomb, mapa, previous_key, n, limit):
     x,y = bomberman_pos
 
     print('limite: ' + str(limit))
@@ -235,6 +207,73 @@ def choose_hide_pos2(bomberman_pos, bomb, mapa, previous_key, n, limit):
             return (bomberman_pos, False)
         else:
             return ([1,1], False)
+
+    ways = get_possible_ways(mapa, bomberman_pos)
+    #print(repr(mapa.map))
+    print("DEBUG: ways: " + repr(ways) + ", prev: " + previous_key)
+
+    if previous_key in ['a', 'd']: # andou para o lado, experimenta para o cima/baixo
+        print("andou para lado ckecking cima")
+        if 'w' in ways:
+            print("andou para lado resultou cima")
+            return choose_hide_pos([x, y - 1], bomb, mapa, 'w', n + 1, limit)
+        print("andou para lado ckecking baixo")
+        if 's' in ways:
+            print("andou para lado resultou baixo")
+            return choose_hide_pos([x,y+1], bomb, mapa, 's', n+1, limit)
+
+    if previous_key in ['w', 's']: # andou na vertical, experimenta para os lados
+        print("andou na vertical  ckecking esquerda")
+        if 'a' in ways:
+            print("andou na vertical resultou esquerda")
+            return choose_hide_pos([x - 1, y], bomb, mapa, 'a', n + 1, limit)
+        print("andou na vertical  ckecking direita")
+        if 'd' in ways:
+            print("andou na vertical  resultou direita")
+            return choose_hide_pos([x + 1, y], bomb, mapa, 'd', n+1, limit)
+
+    print("checking cima")
+    if 'w' in ways:
+        print("resultou cima")
+        return choose_hide_pos([x, y - 1], bomb, mapa, 'w', n + 1, limit)
+    print("checking baixo")
+    if 's' in ways:
+        print("resultou baixo")
+        return choose_hide_pos([x, y + 1], bomb, mapa, 's', n+1, limit)
+
+    print("checking esquerda")
+    if 'a' in ways:
+        print("resultou esquerda")
+        return choose_hide_pos([x - 1, y], bomb, mapa, 'a', n + 1, limit)
+    print("checking direita")
+    if 'd' in ways:
+        print("resultou direita")
+        return choose_hide_pos([x + 1, y], bomb, mapa, 'd', n+1, limit)
+
+
+
+
+def choose_hide_pos2(bomberman_pos, bomb, mapa, previous_key, n, limit):
+    x,y = bomberman_pos
+
+    print('limite: ' + str(limit))
+    print('n: ' + str(n))
+
+
+    if not in_range(bomberman_pos, bomb[2], bomb[0], mapa):
+        print("Posicao segura!")
+        return (bomberman_pos, True)
+
+    if n == limit:
+        print('\n\n\n\nLimite recursivo...going to 2 recursive')
+        return choose_hide_pos(bomberman_pos,bomb,mapa,'',0,100)
+        '''
+        if bomberman_pos != bomb:
+            print('Posicao encontrada nao é segura!')
+            return (bomberman_pos, False)
+        else:
+            return ([1,1], False)
+            '''
 
     ways = get_possible_ways(mapa, bomberman_pos)
     #print(repr(mapa.map))
