@@ -65,13 +65,13 @@ def get_possible_ways(mapa, position):
     tile2 = mapa.map[x-1][y]
     tile3 = mapa.get_tile((x,y+1))
     tile4 = mapa.get_tile((x,y-1))
-    if tile1 != 1 and tile1 != 2:
+    if tile1 != 1 and not [x+1,y] in mapa._walls:
         ways.append('d')
-    if tile3 != 1 and tile3 != 2:
+    if tile3 != 1 and not [x,y+1] in mapa._walls:
         ways.append('s')
-    if tile2 != 1 and tile2 != 2:
+    if tile2 != 1 and not [x-1,y] in mapa._walls:
         ways.append('a')
-    if tile4 != 1 and tile4 != 2:
+    if tile4 != 1 and not [x,y-1] in mapa._walls:
         ways.append('w')
 
     return ways
