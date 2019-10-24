@@ -216,9 +216,8 @@ def choose_hide_pos(bomberman_pos, bomb, enemies, mapa, previous_pos):
         return choose_hide_pos([x,y-1],bomb,enemies,mapa,bomberman_pos)
 
 
-def choose_hide_pos2(bomberman_pos, bomb, mapa, previous_key,n):
+def choose_hide_pos2(bomberman_pos, bomb, mapa, previous_key):
     x,y = bomberman_pos
-
 
     if not in_range(bomberman_pos, bomb[2], bomb[0], mapa):
         print("Posicao segura!")
