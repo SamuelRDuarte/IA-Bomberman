@@ -137,9 +137,10 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                 ##17/10 - Fugir dos inimigos
                 if state['enemies'] !=[] and state['bombs'] ==[]:
                     ord_enemies = closer_enemies(my_pos, state['enemies'])
-                    if dist_to(my_pos, ord_enemies[0][1]) < 2:
-                        key = avoid(my_pos, ord_enemies[0][1], mapa)
-                        #print("FUGI\n")
+                    if in_range(my_pos,3, ord_enemies[0][1], mapa):
+                        print('Enemie close! Pôr bomba!')
+                        key = 'B'
+                        ways.append('B')
 
 
                 if key != '' or key == None:
