@@ -42,40 +42,11 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
 
                 print('ways: ', end='')
                 print(ways)
-                '''
-                # se houver bombas foge
-                if state['bombs'] != []:
-                    pos_bomb, t, raio = state['bombs'][0]
 
-                    sameDir = check_same_direction(pos_bomb, my_pos)
-                    print('Same direction?: ' + str(sameDir))
-
-                    
-                    if dist_to(my_pos, pos_bomb) <= raio:
-                        if sameDir:
-                            print('Fugirrr')
-                            if dist_to(my_pos, pos_bomb) >= 1:
-                                direcao_proibida = inverse(previous_key)
-                                print('Proibido: ' + str(direcao_proibida))
-                                if direcao_proibida in ways:
-                                    ways.remove(direcao_proibida)
-                                key = choose_random_move(ways)
-
-                            else:
-                                key = choose_random_move(ways)
-
-                        else: # esta seguro, espera ate a bomba rebentar
-                            print("Esperar que a bomba rebente...")
-                            key = ''
-                    else: # esta seguro, espera ate a bomba rebentar
-                        print("Esperar que a bomba rebente...")
-                        key = ''
-
-                    '''
                 # fuga recursiva
                 if state['bombs'] != [] and not calc_hide_pos:
                     print("calcurar hide pos")
-                    goal, calc_hide_pos = choose_hide_pos2(my_pos, state['bombs'][0], mapa, '', 0, 100)
+                    goal, calc_hide_pos = choose_hide_pos2(my_pos, state['bombs'][0], mapa, '', 0, 70, state['enemies'])
                     print('my pos:',my_pos)
                     print(goal)
                     print('hide pos: ' + str(calc_hide_pos))
@@ -116,6 +87,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                         print("going to powerups")
                         key = choose_move(my_pos,ways,state['powerups'][0][0])
 
+
                     if state['walls'] != [] and state['powerups'] == []:
                         print("Procurar parede...")
                         wall = next_wall(my_pos, state['walls'])
@@ -127,7 +99,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                         if dist_to(my_pos, wall) <= 1:
                             print('Cheguei à parede! Pôr bomba!')
                             key = 'B'
-                            ways.append('B')                           
+                            ways.append('B')
 
                         # anda até a parede
                         else:
