@@ -131,20 +131,58 @@ def choose_key(mapa, ways, my_pos, positions, goal, last_pos_wanted):
     if positions != []:
         key = goToPosition(my_pos, positions[0])
         positions.pop(0)
-        return key
-    
+        return key,positions
+
     else: # pesquisar caminho
         positions = astar(mapa.map, my_pos, goal)
         print('positions: ' + str(positions))
         if positions == [] or positions == None:
             print('Caminho nao encontrado...')
-            return ''
+            return choose_move(my_pos,ways,goal),[]
+            #return ''
         positions.pop(0)
 
         if len(positions) <= 1 and last_pos_wanted:
-            return choose_move(my_pos, ways, goal)
+            return choose_move(my_pos, ways, goal),[]
 
-        return goToPosition(my_pos, positions[0])
+        return goToPosition(my_pos, positions[0]),positions
+
+
+def choose_key2(mapa, ways, my_pos, positions,wall, oneal, last_pos_wanted):
+    # já sabe o caminho
+
+    if positions != []:
+        key = goToPosition(my_pos, positions[0])
+        positions.pop(0)
+        return key
+
+    else:  # pesquisar caminho
+        if oneal is not None:
+            positions = astar(mapa.map, my_pos, oneal)
+            print('positions enemie: ' + str(positions))
+            if positions == [] or positions == None:
+                positions = astar(mapa.map,my_pos,wall)
+                print('positions wall: ' + str(positions))
+                if positions == [] or positions == None:
+                    print('Caminho nao encontrado...')
+                    # return choose_move(my_pos,ways,goal)
+                    return choose_random_move(ways),''
+                goal = wall
+            goal = oneal
+        else:
+            positions = astar(mapa.map, my_pos, wall)
+            print('positions wall: ' + str(positions))
+            if positions == [] or positions == None:
+                print('Caminho nao encontrado...')
+                # return choose_move(my_pos,ways,goal)
+                return '', ''
+            goal = wall
+        positions.pop(0)
+
+        if len(positions) <= 1 and last_pos_wanted:
+            return choose_move(my_pos, ways, goal),goal
+
+        return goToPosition(my_pos, positions[0]),goal
 
                
 
