@@ -35,6 +35,7 @@ def astar(maze, start, end):
     open_list.append(start_node)
 
     # Loop until you find the end
+    count_open_nodes = 0
     while len(open_list) > 0:
 
         # Get the current node
@@ -53,18 +54,14 @@ def astar(maze, start, end):
         if current_node.dist_to(end_node)  <= 1:
             path = []
             current = current_node
-            limit = 0
             while current is not None:
-                if limit >= 200:
-                    print('\n\nAstar limite\n')
-                    return []
                 path.append(current.position)
                 current = current.parent
-                limit += 1
             return path[::-1] # Return reversed path
 
         # Generate children
         children = []
+        count = 0
                             # tirei as diagonais
         for new_position in [(0, -1), (0, 1), (-1, 0), (1, 0)]: # Adjacent squares
 
@@ -81,9 +78,14 @@ def astar(maze, start, end):
 
             # Create new node
             new_node = Node(current_node, node_position)
+            count += 1
+
+            if count > 4:
+                return []
 
             # Append
             children.append(new_node)
+            print('New node!')
 
         # Loop through children
         for child in children:
@@ -105,6 +107,12 @@ def astar(maze, start, end):
 
             # Add the child to the open list
             open_list.append(child)
+            print('Adicionar à lista de nos abertos')
+            count_open_nodes += 1
+            if count_open_nodes > 50:
+                return []
+
+
 
 
     
