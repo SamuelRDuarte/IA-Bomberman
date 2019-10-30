@@ -26,6 +26,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
         previous_level = None
         previous_lives = None
         positions = []
+        history=[]
 
         while True:
             try:
@@ -126,8 +127,20 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                         else:
                             print('Encontrar caminho até à parede alvo: ' + str(wall))
                             key = choose_key(mapa, ways, my_pos, positions, wall, False)
-                            
-                            
+
+                    oneils=[]
+                    oneils = [e for e in state['enemies'] if e['name'] == 'Oneal']
+#                    print(oneils)
+                    oneils.sort(key=lambda x: dist_to(my_pos, x['pos']))
+
+                    if oneils != [] and dist_to(my_pos,oneils[0]['pos'])>1.5:
+                        key = choose_key(mapa, ways, my_pos, positions, oneils[0]['pos'], False)
+
+                    if len(history)>=2:
+                        if history[len(history)-1] == history[len(history)-2]:
+                            key=choose_random_move(ways)
+                            print ("\n\n\nTINHA BUGADO\n\n\n")
+
                 ##17/10 - Fugir dos inimigos
                 if state['enemies'] !=[] and state['bombs'] ==[]:
                     ord_enemies = closer_enemies(my_pos, state['enemies'])
@@ -144,7 +157,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                         key = choose_move(my_pos, ways, wall)
                 '''
                 
-
+                history.append(my_pos)
                 previous_level = state['level']
                 previous_lives = state['lives']
                 previous_key = key
