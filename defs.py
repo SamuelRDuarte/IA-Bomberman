@@ -292,7 +292,7 @@ def choose_hide_pos(bomberman_pos, bomb, mapa, previous_key, n, limit,enemies):
     ord_enemies = closer_enemies(bomberman_pos, enemies)
     #print("enemie close: ",ord_enemies[0])
 
-    if not in_range(bomberman_pos, bomb[2], bomb[0], mapa) and not in_range(bomberman_pos,1, ord_enemies[0][1], mapa):
+    if not in_range(bomberman_pos, bomb[2], bomb[0], mapa) and not in_range(bomberman_pos,2, ord_enemies[0][1], mapa):
         print("Posicao segura!")
         return (bomberman_pos, True)
 
@@ -347,7 +347,7 @@ def choose_hide_pos(bomberman_pos, bomb, mapa, previous_key, n, limit,enemies):
         print("resultou direita")
         return choose_hide_pos([x + 1, y], bomb, mapa, 'd', n+1, limit,enemies)
     else:
-        return choose_hide_pos2(bomb[0],bomb,mapa,previous_key,n+1,limit,enemies)
+        return bomberman_pos,False
 
 
 
@@ -360,7 +360,7 @@ def choose_hide_pos2(bomberman_pos, bomb, mapa, previous_key, n, limit,enemies):
     ord_enemies = closer_enemies(bomberman_pos, enemies)
     #print("enemie close: ", ord_enemies[0])
 
-    if not in_range(bomberman_pos, bomb[2], bomb[0], mapa)and not in_range(bomberman_pos,1, ord_enemies[0][1], mapa) :
+    if not in_range(bomberman_pos, bomb[2], bomb[0], mapa)and not in_range(bomberman_pos,2, ord_enemies[0][1], mapa) :
         print("Posicao segura!")
         return (bomberman_pos, True)
 
@@ -410,7 +410,7 @@ def choose_hide_pos2(bomberman_pos, bomb, mapa, previous_key, n, limit,enemies):
         print("resultou esquerda")
         return choose_hide_pos2([x-1,y], bomb, mapa, 'a', n+1, limit,enemies)
     else:
-        return choose_hide_pos2(bomb[0],bomb,mapa,previous_key,n+1,limit,enemies)
+        return choose_hide_pos(bomb[0],bomb,mapa,previous_key,n+1,limit,enemies)
 
 
 #Verifica o mais perto   ---> A funcionar

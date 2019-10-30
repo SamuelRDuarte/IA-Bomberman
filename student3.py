@@ -100,7 +100,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
 
                 elif state['bombs'] == []:  # nao ha bombas
                     calc_hide_pos = False
-                    oneils = [e for e in state['enemies'] if e['name'] == 'Oneal']
+                    oneils = [e for e in state['enemies'] if e['name'] in ['Oneal','Minvo','Kondoria']]
 
                     if state['walls'] == [] and state['enemies'] != [] and state['powerups'] == []:
 
@@ -117,8 +117,8 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                     # apanhar powerups
                     elif state['powerups'] != []:
                         print("going to powerups")
-                        # key = choose_move(my_pos,ways,state['powerups'][0][0])
-                        key,positions = choose_key(mapa, ways, my_pos, positions, state['powerups'][0][0], True)
+                        key = choose_move(my_pos,ways,state['powerups'][0][0])
+                        #key,positions = choose_key(mapa, ways, my_pos, positions, state['powerups'][0][0], True)
                         goal = state['powerups'][0][0]
                         powerup = state['powerups'][0][0]
 
