@@ -196,6 +196,8 @@ def next_wall(bomberman_pos, walls):
 
 def in_range(bomberman_pos,raio,obstaculo,mapa):
     cx,cy = bomberman_pos
+    if obstaculo == None:
+        return False
     bx,by = obstaculo
     
     if by == cy:
@@ -237,9 +239,9 @@ def choose_hide_pos(bomberman_pos, bomb, mapa, previous_key, n, limit,enemies):
     print('n: ' + str(n))
 
     ord_enemies = closer_enemies(bomberman_pos, enemies)
-    print("enemie close: ",ord_enemies[0])
+    #print("enemie close: ",ord_enemies[0])
 
-    if not in_range(bomberman_pos, bomb[2], bomb[0], mapa) and not in_range(bomberman_pos,2, ord_enemies[0][1], mapa):
+    if not in_range(bomberman_pos, bomb[2], bomb[0], mapa) and not in_range(bomberman_pos,1, ord_enemies[0][1], mapa):
         print("Posicao segura!")
         return (bomberman_pos, True)
 
@@ -258,39 +260,39 @@ def choose_hide_pos(bomberman_pos, bomb, mapa, previous_key, n, limit,enemies):
 
     if previous_key in ['a', 'd']: # andou para o lado, experimenta para o cima/baixo
         print("andou para lado ckecking cima")
-        if 'w' in ways and not in_range(bomberman_pos,1, ord_enemies[0][1], mapa):
+        if 'w' in ways and not in_range(bomberman_pos,0, ord_enemies[0][1], mapa):
             print("andou para lado resultou cima")
             return choose_hide_pos([x, y - 1], bomb, mapa, 'w', n + 1, limit,enemies)
         print("andou para lado ckecking baixo")
-        if 's' in ways and not in_range(bomberman_pos,1, ord_enemies[0][1], mapa):
+        if 's' in ways and not in_range(bomberman_pos,0, ord_enemies[0][1], mapa):
             print("andou para lado resultou baixo")
             return choose_hide_pos([x,y+1], bomb, mapa, 's', n+1, limit,enemies)
 
     if previous_key in ['w', 's']: # andou na vertical, experimenta para os lados
         print("andou na vertical  ckecking esquerda")
-        if 'a' in ways and not in_range(bomberman_pos,1, ord_enemies[0][1], mapa):
+        if 'a' in ways and not in_range(bomberman_pos,0, ord_enemies[0][1], mapa):
             print("andou na vertical resultou esquerda")
             return choose_hide_pos([x - 1, y], bomb, mapa, 'a', n + 1, limit,enemies)
         print("andou na vertical  ckecking direita")
-        if 'd' in ways and not in_range(bomberman_pos,1, ord_enemies[0][1], mapa):
+        if 'd' in ways and not in_range(bomberman_pos,0, ord_enemies[0][1], mapa):
             print("andou na vertical  resultou direita")
             return choose_hide_pos([x + 1, y], bomb, mapa, 'd', n+1, limit,enemies)
 
     print("checking cima")
-    if 'w' in ways and not in_range(bomberman_pos,1, ord_enemies[0][1], mapa):
+    if 'w' in ways and not in_range(bomberman_pos,0, ord_enemies[0][1], mapa):
         print("resultou cima")
         return choose_hide_pos([x, y - 1], bomb, mapa, 'w', n + 1, limit,enemies)
     print("checking baixo")
-    if 's' in ways and not in_range(bomberman_pos,1, ord_enemies[0][1], mapa):
+    if 's' in ways and not in_range(bomberman_pos,0, ord_enemies[0][1], mapa):
         print("resultou baixo")
         return choose_hide_pos([x, y + 1], bomb, mapa, 's', n+1, limit,enemies)
 
     print("checking esquerda")
-    if 'a' in ways and not in_range(bomberman_pos,1, ord_enemies[0][1], mapa):
+    if 'a' in ways and not in_range(bomberman_pos,0, ord_enemies[0][1], mapa):
         print("resultou esquerda")
         return choose_hide_pos([x - 1, y], bomb, mapa, 'a', n + 1, limit,enemies)
     print("checking direita")
-    if 'd' in ways and not in_range(bomberman_pos,1, ord_enemies[0][1], mapa):
+    if 'd' in ways and not in_range(bomberman_pos,0, ord_enemies[0][1], mapa):
         print("resultou direita")
         return choose_hide_pos([x + 1, y], bomb, mapa, 'd', n+1, limit,enemies)
     else:
@@ -305,9 +307,9 @@ def choose_hide_pos2(bomberman_pos, bomb, mapa, previous_key, n, limit,enemies):
     print('limite: ' + str(limit))
     print('n: ' + str(n))
     ord_enemies = closer_enemies(bomberman_pos, enemies)
-    print("enemie close: ", ord_enemies[0])
+    #print("enemie close: ", ord_enemies[0])
 
-    if not in_range(bomberman_pos, bomb[2], bomb[0], mapa)and not in_range(bomberman_pos,2, ord_enemies[0][1], mapa) :
+    if not in_range(bomberman_pos, bomb[2], bomb[0], mapa)and not in_range(bomberman_pos,1, ord_enemies[0][1], mapa) :
         print("Posicao segura!")
         return (bomberman_pos, True)
 
@@ -321,39 +323,39 @@ def choose_hide_pos2(bomberman_pos, bomb, mapa, previous_key, n, limit,enemies):
 
     if previous_key in ['a', 'd']: # andou para o lado, experimenta para o cima/baixo
         print("andou para lado ckecking baixo")
-        if 's' in ways and not in_range(bomberman_pos,1, ord_enemies[0][1], mapa):
+        if 's' in ways and not in_range(bomberman_pos,0, ord_enemies[0][1], mapa):
             print("andou para lado resultou baixo")           
             return choose_hide_pos2([x,y+1], bomb, mapa, 's', n+1, limit,enemies)
         print("andou para lado ckecking cima")
-        if 'w' in ways and not in_range(bomberman_pos,1, ord_enemies[0][1], mapa):
+        if 'w' in ways and not in_range(bomberman_pos,0, ord_enemies[0][1], mapa):
             print("andou para lado resultou cima")
             return choose_hide_pos2([x, y - 1], bomb, mapa, 'w', n+1, limit,enemies)
 
     if previous_key in ['w', 's']: # andou na vertical, experimenta para os lados
         print("andou na vertical  ckecking direita")
-        if 'd' in ways and not in_range(bomberman_pos,1, ord_enemies[0][1], mapa):
+        if 'd' in ways and not in_range(bomberman_pos,0, ord_enemies[0][1], mapa):
             print("andou na vertical  resultou direita")
             return choose_hide_pos2([x + 1, y], bomb, mapa, 'd', n+1, limit, enemies)
         print("andou na vertical  ckecking esquerda")
-        if 'a' in ways and not in_range(bomberman_pos,1, ord_enemies[0][1], mapa):
+        if 'a' in ways and not in_range(bomberman_pos,0, ord_enemies[0][1], mapa):
             print("andou na vertical resultou esquerda")
             return choose_hide_pos2([x-1,y], bomb, mapa, 'a', n+1, limit,enemies)
 
     print("checking baixo")
-    if 's' in ways and not in_range(bomberman_pos,1, ord_enemies[0][1], mapa):
+    if 's' in ways and not in_range(bomberman_pos,0, ord_enemies[0][1], mapa):
         print("resultou baixo")
         return choose_hide_pos2([x, y + 1], bomb, mapa, 's', n+1, limit,enemies)
     print("checking cima")
-    if 'w' in ways and not in_range(bomberman_pos,1, ord_enemies[0][1], mapa):
+    if 'w' in ways and not in_range(bomberman_pos,0, ord_enemies[0][1], mapa):
         print("resultou cima")
         return choose_hide_pos2([x, y - 1], bomb, mapa, 'w', n+1, limit,enemies)
 
     print("checking direita")
-    if 'd' in ways and not in_range(bomberman_pos,1, ord_enemies[0][1], mapa):
+    if 'd' in ways and not in_range(bomberman_pos,0, ord_enemies[0][1], mapa):
         print("resultou direita")
         return choose_hide_pos2([x + 1, y], bomb, mapa, 'd', n+1, limit,enemies)
     print("checking esquerda")
-    if 'a' in ways and not in_range(bomberman_pos,1, ord_enemies[0][1], mapa):
+    if 'a' in ways and not in_range(bomberman_pos,0, ord_enemies[0][1], mapa):
         print("resultou esquerda")
         return choose_hide_pos2([x-1,y], bomb, mapa, 'a', n+1, limit,enemies)
     else:
@@ -361,12 +363,14 @@ def choose_hide_pos2(bomberman_pos, bomb, mapa, previous_key, n, limit,enemies):
 
 
 #Verifica o mais perto   ---> A funcionar
-def closer_enemies(my_pos,list):
+def closer_enemies(my_pos,lista):
     lista1=[]
+    if lista == []:
+        return [(None,None)]
 
-    for i in range(len(list)):
-        coor=list[i]['pos']
-        lista1.append([dist_to(my_pos,list[i]['pos']),list[i]['pos']])
+    for i in range(len(lista)):
+        coor=lista[i]['pos']
+        lista1.append([dist_to(my_pos,lista[i]['pos']),lista[i]['pos']])
 
         #Guarda uma lista de tuplos (id e distancia), ordenada por distancias
     lista1.sort(key=lambda x: x[0])  # ordenar por custo (distancia)
