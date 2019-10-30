@@ -48,6 +48,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                         previous_level = state['level']
                         previous_lives = state['lives']
                         positions = []
+                        history=[]
                 
                 
                 my_pos = state['bomberman']
@@ -128,27 +129,40 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                             print('Encontrar caminho até à parede alvo: ' + str(wall))
                             key = choose_key(mapa, ways, my_pos, positions, wall, False)
 
-                    oneils=[]
-                    oneils = [e for e in state['enemies'] if e['name'] == 'Oneal']
-#                    print(oneils)
-                    oneils.sort(key=lambda x: dist_to(my_pos, x['pos']))
 
-                    if oneils != [] and dist_to(my_pos,oneils[0]['pos'])>1.5:
-                        key = choose_key(mapa, ways, my_pos, positions, oneils[0]['pos'], False)
+
+
+                    oneils = [e for e in state['enemies'] if e['name'] == 'Oneal']
+
+                    if oneils != [] :
+                        oneils.sort(key=lambda x: dist_to(my_pos, x['pos']))
+
+                        if in_range(my_pos, 1, oneils[0]['pos'], mapa):
+                            print('Enemie close! Pôr bomba!')
+                            key = 'B'
+                            ways.append('B')
+
+
+                        if oneils != [] and dist_to(my_pos,oneils[0]['pos'])>1:
+                            key = choose_key(mapa, ways, my_pos, positions, oneils[0]['pos'], False)
 
                     if len(history)>=2:
                         if history[len(history)-1] == history[len(history)-2]:
                             key=choose_random_move(ways)
                             print ("\n\n\nTINHA BUGADO\n\n\n")
 
-                ##17/10 - Fugir dos inimigos
+
                 if state['enemies'] !=[] and state['bombs'] ==[]:
-                    ord_enemies = closer_enemies(my_pos, state['enemies'])
-                    if in_range(my_pos,3, ord_enemies[0][1], mapa):
+                    ##17/10 - Fugir dos inimigos
+                    ballooms = []
+                    ballooms = [b for b in state['enemies'] if b['name'] == "Balloom"]
+                    ballooms.sort(key=lambda x: dist_to(my_pos, x['pos']))
+
+                    if in_range(my_pos,3, ballooms[0]['pos'], mapa):
                         print('Enemie close! Pôr bomba!')
                         key = 'B'
                         ways.append('B')
-                
+
                 ''' 
                 # garantir que key é válida
                 if key != '' or key == None:

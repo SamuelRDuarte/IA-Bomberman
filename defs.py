@@ -235,6 +235,16 @@ def enemie_close(bomberman_pos,enimies,mapa):
     return False
     
 
+def bomb_and_run(bomberman_pos, enemy, range,inimigos,mapa,ways):
+        lista=[e for e in inimigos if e['name']== enemy]
+        lista.sort(key = lambda x: dist_to(bomberman_pos,x['pos']))
+        if in_range(bomberman_pos, range, lista[0]['pos'], mapa):
+            print('Enemie close! Pôr bomba!')
+            key = 'B'
+            ways.append('B')
+
+
+
 def choose_hide_pos(bomberman_pos, bomb, mapa, previous_key, n, limit,enemies):
     x,y = bomberman_pos
 
