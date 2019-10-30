@@ -91,24 +91,25 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                         else:
                             #key = goto(my_pos,(1,1))
                             #key = choose_move(my_pos, ways, [1, 1])
-                            key = choose_key(mapa, my_pos, positions, [1,1], True)
+                            key = choose_key(mapa, ways, my_pos, positions, [1,1], True)
 
                     # ir para 'exit'
                     if state['walls'] == [] and state['enemies'] == [] and state['powerups'] == []:
                         print("going to exit")
-                        key = choose_key(mapa, my_pos, positions, state['exit'], True)
+                        key = choose_key(mapa, ways, my_pos, positions, state['exit'], True)
                         #key = choose_move(my_pos,ways,state['exit'])
 
                     # apanhar powerups
                     if state['powerups'] != []:
                         print("going to powerups")
                         #key = choose_move(my_pos,ways,state['powerups'][0][0])
-                        key = choose_key(mapa, my_pos, positions, state['powerups'][0][0], True)
+                        key = choose_key(mapa, ways, my_pos, positions, state['powerups'][0][0], True)
 
 
                     if state['walls'] != [] and state['powerups'] == []:
-                        print("Procurar parede...")
+                        print("Escolher parede alvo...")
                         print('my' + str(my_pos))
+
                         if positions == []:
                             wall = next_wall(my_pos, state['walls'])
 
@@ -123,21 +124,10 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
 
                         # anda até a parede
                         else:
-                            print('Andar até à parede: ' + str(wall))
-                            key = choose_key(mapa, my_pos, positions, wall, False)
+                            print('Encontrar caminho até à parede alvo: ' + str(wall))
+                            key = choose_key(mapa, ways, my_pos, positions, wall, False)
                             
-                            '''
-                            if positions != []:
-                                key = choose_move(my_pos, ways, positions[0])
-                                positions.pop(0)
-                            else:
-                                positions = astar(mapa.map, my_pos, wall)
-                                print('positions: ' + str(positions))
-                                positions.pop(0)
-                                key = choose_move(my_pos, ways, positions[0])
-                            '''
-
-
+                            
                 ##17/10 - Fugir dos inimigos
                 if state['enemies'] !=[] and state['bombs'] ==[]:
                     ord_enemies = closer_enemies(my_pos, state['enemies'])
@@ -145,12 +135,15 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                         print('Enemie close! Pôr bomba!')
                         key = 'B'
                         ways.append('B')
-                '''
+                
+                ''' 
+                # garantir que key é válida
                 if key != '' or key == None:
                     if not key in ways:
                         print('Caminho impossivel... escolhendo novo')
                         key = choose_move(my_pos, ways, wall)
                 '''
+                
 
                 previous_level = state['level']
                 previous_lives = state['lives']

@@ -126,7 +126,7 @@ def goToPosition(my_pos, next_pos):
     
     return getKey(res)
 
-def choose_key(mapa, my_pos, positions, goal, last_pos_wanted):
+def choose_key(mapa, ways, my_pos, positions, goal, last_pos_wanted):
     # já sabe o caminho
     if positions != []:
         key = goToPosition(my_pos, positions[0])
@@ -139,7 +139,8 @@ def choose_key(mapa, my_pos, positions, goal, last_pos_wanted):
         positions.pop(0)
 
         if len(positions) <= 1 and last_pos_wanted:
-            return goto(my_pos, goal)
+            print('goto!')
+            return choose_move(my_pos, ways, goal)
 
         return goToPosition(my_pos, positions[0])
 

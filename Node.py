@@ -53,9 +53,14 @@ def astar(maze, start, end):
         if current_node.dist_to(end_node)  <= 1:
             path = []
             current = current_node
+            limit = 0
             while current is not None:
+                if limit >= 200:
+                    print('\n\nAstar limite\n')
+                    return []
                 path.append(current.position)
                 current = current.parent
+                limit += 1
             return path[::-1] # Return reversed path
 
         # Generate children
