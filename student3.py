@@ -30,6 +30,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
         limite = 0
         got_powerup = False
         powerup = [0,0]
+        detonador = False
 
         while True:
             try:
@@ -48,6 +49,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                     if previous_level != state['level']:
                         got_powerup = False
                         powerup = [0,0]
+
                     if previous_level != state['level'] or previous_lives != state['lives']:
                         print('RESET')
                         calc_hide_pos = False
@@ -62,6 +64,8 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                 ways = get_possible_ways(mapa, my_pos)
                 if my_pos == powerup:
                     got_powerup = True
+                    if state['level'] == 3:
+                        detonador = True
 
                 print('ways: ', end='')
                 print(ways)
@@ -86,8 +90,13 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                         print('key hide pos :', key)
 
                     else:  # esta seguro, espera ate a bomba rebentar
-                        print("Esperar que a bomba rebente...")
-                        key = ''
+                        if detonador:
+                            print('Usar detonador')
+                            key = 'A'
+                            ways.append('A')
+                        else:
+                            print("Esperar que a bomba rebente...")
+                            key = ''
 
                 elif state['bombs'] == []:  # nao ha bombas
                     calc_hide_pos = False
@@ -187,6 +196,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                 previous_key = key
                 print('Sending key: ' + key + '\n\n')
                 print("got_powerup: ",got_powerup)
+                print('Detonador: ', detonador)
 
                 await websocket.send(
                     json.dumps({"cmd": "key", "key": key})

@@ -78,6 +78,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                         print('key hide pos :',key)
 
                     else: # esta seguro, espera ate a bomba rebentar
+                        
                         print("Esperar que a bomba rebente...")
                         key = ''
 
