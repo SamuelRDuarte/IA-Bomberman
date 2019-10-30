@@ -1,5 +1,8 @@
+# source: https://medium.com/@nicholas.w.swift/easy-a-star-pathfinding-7e6689c7f7b2
+import math
+
 class Node:
-    def __init__(self, parent=None, position=Node):
+    def __init__(self, parent=None, position=None):
         self.parent = parent
         self.position = position 
 
@@ -10,6 +13,9 @@ class Node:
 
     def __eq__(self, value):
         return self.position == value.position
+
+    def dist_to(self, pos):
+        return math.pow((self.position[0] - pos.position[0]), 2) + math.pow((self.position[1] - pos.position[1]), 2)
 
 
 def astar(maze, start, end):
@@ -43,8 +49,8 @@ def astar(maze, start, end):
         open_list.pop(current_index)
         closed_list.append(current_node)
 
-        # Found the goal
-        if current_node == end_node:
+        # Found the goal         
+        if current_node.dist_to(end_node)  <= 1:
             path = []
             current = current_node
             while current is not None:
@@ -78,14 +84,13 @@ def astar(maze, start, end):
         for child in children:
 
             # Child is on the closed list
-            for closed_child in closed_list:
-                if child == closed_child:
-                    continue
+            if child in closed_list:
+                continue
 
             # Create the f, g, and h values
             child.g = current_node.g + 1
-            #child.h = ((child.position[0] - end_node.position[0]) ** 2) + ((child.position[1] - end_node.position[1]) ** 2)
-            child.h = math.sqrt((child.position[0] - end_node.position[0]) ** 2) + ((child.position[1] - end_node.position[1]) ** 2)
+            child.h = ((child.position[0] - end_node.position[0]) ** 2) + ((child.position[1] - end_node.position[1]) ** 2)
+            #child.h = math.sqrt((child.position[0] - end_node.position[0]) ** 2) + ((child.position[1] - end_node.position[1]) ** 2)
             child.f = child.g + child.h
 
             # Child is already in the open list

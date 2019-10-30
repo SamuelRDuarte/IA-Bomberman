@@ -2,6 +2,7 @@ from game import Bomb
 from mapa import Map
 import math
 import random
+from Node import *
 
 def vector2dir(vx, vy):
     m = max(abs(vx), abs(vy))
@@ -55,6 +56,7 @@ def get_possible_ways2(mapa, position):
 
     return ways
 
+
 def get_possible_ways(mapa, position):  
     ways = []
 
@@ -102,6 +104,45 @@ def choose_move(my_pos, ways, goal):
     custo_min.sort(key= lambda x: x[1]) # ordenar por custo (distancia)
 
     return custo_min[0][0]
+
+def getKey(pos):
+    if len(pos) != 2:
+        return ''
+    
+    if pos == (1,0):
+        return 'd'
+    elif pos == (-1,0):
+        return 'a'
+    elif pos == (0,1):
+        return 's'
+    elif pos == (0,-1):
+        return 'w' 
+
+def goToPosition(my_pos, next_pos):
+    mx,my = my_pos
+    nx,ny = next_pos
+
+    res = (nx-mx),(ny-my)
+    
+    return getKey(res)
+
+def choose_key(mapa, my_pos, positions, goal, last_pos_wanted):
+    # já sabe o caminho
+    if positions != []:
+        key = goToPosition(my_pos, positions[0])
+        positions.pop(0)
+        return key
+    
+    else: # pesquisar caminho
+        positions = astar(mapa.map, my_pos, goal)
+        print('positions: ' + str(positions))
+        positions.pop(0)
+
+        if len(positions) <= 1 and last_pos_wanted:
+            return goto(my_pos, goal)
+
+        return goToPosition(my_pos, positions[0])
+
                
 
 # dando uma key retorna a sua inversa
