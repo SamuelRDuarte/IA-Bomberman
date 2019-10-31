@@ -114,7 +114,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
 
                 elif state['bombs'] == []:  # nao ha bombas
                     calc_hide_pos = False
-                    oneils = [e for e in state['enemies'] if e['name'] in ['Oneal','Minvo','Kondoria','Ovapi']]
+                    oneils = [e for e in state['enemies'] if e['name'] in ['Oneal','Minvo','Kondoria','Ovapi','Pass']]
                     #oneils = state['enemies']
                     if state['walls'] == [] and state['enemies'] != [] and state['powerups'] == []:
 
