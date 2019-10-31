@@ -31,6 +31,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
         got_powerup = False
         powerup = [0,0]
         detonador = False
+        change=True
 
         while True:
             try:
@@ -83,21 +84,33 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
 
                 elif state['bombs'] != [] and calc_hide_pos:
                     print('já sabe a hide pos!')
-                    if dist_to(my_pos, goal) != 0:
-                        print("ir para hide pos")
-                        key = choose_move(my_pos, ways, goal)
-                        print('hide pos: ', goal)
-                        # key = choose_key(mapa, my_pos, positions, goal, True)
-                        print('key hide pos :', key)
 
-                    else:  # esta seguro, espera ate a bomba rebentar
-                        if detonador:
-                            print('Usar detonador')
-                            key = 'A'
-                            ways.append('A')
-                        else:
-                            print("Esperar que a bomba rebente...")
-                            key = ''
+                    if len(history) > 11:
+                        for i in range(0,10):
+                            if history[i] != history[i+1]:
+                                change= False
+
+                    if not change:
+                        if dist_to(my_pos, goal) != 0:
+                            print("ir para hide pos")
+                            key = choose_move(my_pos, ways, goal)
+                            print('hide pos: ', goal)
+                            # key = choose_key(mapa, my_pos, positions, goal, True)
+                            print('key hide pos :', key)
+
+                        else:  # esta seguro, espera ate a bomba rebentar
+                            if detonador:
+                                print('Usar detonador')
+                                key = 'A'
+                                ways.append('A')
+                            else:
+                                print("Esperar que a bomba rebente...")
+                                key = ''
+
+                    else:
+                        print("A ir para o [1,1]! ZWA")
+                        change=True
+                        key=choose_move(my_pos,ways,[1,1])
 
                 elif state['bombs'] == []:  # nao ha bombas
                     calc_hide_pos = False
@@ -107,8 +120,13 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
 
                         print("going to kill enemies")
                         if dist_to(my_pos, (1, 1)) == 0:
-                            key = 'B'
-                            ways.append('B')
+                            ballooms = state['enemies']
+                            ballooms.sort(key=lambda x: dist_to(my_pos, x['pos']))
+                            if dist_to([1,1],ballooms[0]['pos']) < 6:
+                                key = 'B'
+                                ways.append('B')
+                            else:
+                                pass
                         else:
                             # key = goto(my_pos,(1,1))
                             # key = choose_move(my_pos, ways, [1, 1])
@@ -194,7 +212,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                     ballooms.sort(key=lambda x: dist_to(my_pos, x['pos']))
                     if key in ['w','s','d','a']:
                         if in_range(mapa.calc_pos(my_pos,key), 1, ballooms[0]['pos'], mapa):
-                            print('Enemie close! Pôr bomba!')
+                            print('Enemie close! Pôr bomba! (Calculado)')
                             key = 'B'
                             ways.append('B')
                     else:
