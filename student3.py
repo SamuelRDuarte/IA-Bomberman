@@ -73,9 +73,9 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                 # fuga recursiva
                 if state['bombs'] != [] and not calc_hide_pos:
                     print("calcurar hide pos")
-                    goal, calc_hide_pos = choose_hide_pos2(my_pos, state['bombs'][0], mapa, '', 0, 60, state['enemies'])
+                    goal, calc_hide_pos = choose_hide_pos2(my_pos, state['bombs'][0], mapa, '', 0, 60, state['enemies'],detonador)
                     print('my pos:', my_pos)
-                    print(goal)
+                    print('hide pos calculado:',goal)
                     print('hide pos: ' + str(calc_hide_pos))
                     key = choose_move(my_pos, ways, goal)
                     # key = choose_key(mapa, my_pos, positions, goal, True)
@@ -86,6 +86,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                     if dist_to(my_pos, goal) != 0:
                         print("ir para hide pos")
                         key = choose_move(my_pos, ways, goal)
+                        print('hide pos: ', goal)
                         # key = choose_key(mapa, my_pos, positions, goal, True)
                         print('key hide pos :', key)
 
@@ -100,8 +101,8 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
 
                 elif state['bombs'] == []:  # nao ha bombas
                     calc_hide_pos = False
-                    oneils = [e for e in state['enemies'] if e['name'] in ['Oneal','Minvo','Kondoria']]
-
+                    oneils = [e for e in state['enemies'] if e['name'] in ['Oneal','Minvo','Kondoria','Ovapi']]
+                    #oneils = state['enemies']
                     if state['walls'] == [] and state['enemies'] != [] and state['powerups'] == []:
 
                         print("going to kill enemies")
@@ -117,18 +118,29 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                     # apanhar powerups
                     elif state['powerups'] != []:
                         print("going to powerups")
-                        key = choose_move(my_pos,ways,state['powerups'][0][0])
+                        #key = choose_move(my_pos,ways,state['powerups'][0][0])
                         #key,positions = choose_key(mapa, ways, my_pos, positions, state['powerups'][0][0], True)
+                        key = goto(my_pos,state['powerups'][0][0])
                         goal = state['powerups'][0][0]
                         powerup = state['powerups'][0][0]
+                        if state['walls']:
+                            parede = min(state['walls'], key=lambda x: dist_to(my_pos, x))
+                            if dist_to(my_pos, parede) <= 1:
+                                key = 'B'
+                                ways.append('B')
 
 
                     # ir para 'exit'
                     elif got_powerup and state['enemies'] == [] and state['exit'] != []:
                         print("going to exit")
-                        key,positions = choose_key(mapa, ways, my_pos, positions, state['exit'], True)
+                        #key,positions = choose_key(mapa, ways, my_pos, positions, state['exit'], True)
                         goal = state['exit']
-                        # key = choose_move(my_pos,ways,state['exit'])
+                        key = choose_move(my_pos,ways,state['exit'])
+                        if state['walls']:
+                            parede = min(state['walls'], key=lambda x: dist_to(my_pos, x))
+                            if dist_to(my_pos, parede) <= 1:
+                                key = 'B'
+                                ways.append('B')
                     elif state['walls'] != []:
                         print("Escolher parede alvo...")
                         print('my' + str(my_pos))
@@ -150,14 +162,16 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
 
                         elif oneils !=[]:
                             oneils.sort(key=lambda x: dist_to(my_pos, x['pos']))
-                            if in_range(my_pos, 1, oneils[0]['pos'], mapa):
-                                print('Enemie close! Pôr bomba!')
+                            if in_range(my_pos, 0, oneils[0]['pos'], mapa):
+                                print('Enemie close! Pôr bomba! oneleas')
                                 key = 'B'
                                 ways.append('B')
                         # anda até a parede
                             else:
-                                print('Encontrar caminho até à parede alvo: ' + str(wall))
+                                print('Encontrar caminho até à parede alvo: ' + str(oneils[0]['pos']) +', ' + str(wall))
                                 key,goal = choose_key2(mapa, ways, my_pos, positions, wall,oneils[0]['pos'], False)
+
+
                         else:
                             print('Encontrar caminho até à parede alvo: ' + str(wall))
                             key,positions= choose_key(mapa, ways, my_pos, positions, wall, False)
@@ -178,11 +192,16 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                     ##17/10 - Fugir dos inimigos
                     ballooms = state['enemies']
                     ballooms.sort(key=lambda x: dist_to(my_pos, x['pos']))
-
-                    if in_range(my_pos, 3, ballooms[0]['pos'], mapa):
-                        print('Enemie close! Pôr bomba!')
-                        key = 'B'
-                        ways.append('B')
+                    if key in ['w','s','d','a']:
+                        if in_range(mapa.calc_pos(my_pos,key), 1, ballooms[0]['pos'], mapa):
+                            print('Enemie close! Pôr bomba!')
+                            key = 'B'
+                            ways.append('B')
+                    else:
+                        if in_range(my_pos, 1, ballooms[0]['pos'], mapa):
+                            print('Enemie close! Pôr bomba!')
+                            key = 'B'
+                            ways.append('B')
 
                # garantir que key é válida
                 if key != '' or key == None:
