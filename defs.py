@@ -17,7 +17,7 @@ def vector2dir(vx, vy):
         else:
             d = 'w'  # w
     return d
-
+    
 
 def goto(origem, destino):
     if len(origem) != 2 or len(destino) != 2:

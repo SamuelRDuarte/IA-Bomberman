@@ -32,6 +32,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
         powerup = [0,0]
         detonador = False
         change=True
+        enemyCloseCounter = 0
 
         while True:
             try:
@@ -59,6 +60,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                         positions = []
                         history = []
                         goal = []
+                        enemyCloseCounter = 0
 
 
                 my_pos = state['bomberman']
@@ -114,8 +116,13 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
 
                 elif state['bombs'] == []:  # nao ha bombas
                     calc_hide_pos = False
-                    oneils = [e for e in state['enemies'] if e['name'] in ['Oneal','Minvo','Kondoria','Ovapi']]
-                    #oneils = state['enemies']
+                    # nos primeiros 2 niveis nao procura os ballons
+                    if state['level'] > 2:
+                        oneils = state['enemies']
+                    else:
+                        oneils = [e for e in state['enemies'] if e['name'] in ['Oneal','Minvo','Kondoria','Ovapi','Pass']]
+
+                    # só há inimigos vai para a posição [1,1]
                     if state['walls'] == [] and state['enemies'] != [] and state['powerups'] == []:
 
                         print("going to kill enemies")
@@ -159,6 +166,8 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                             if dist_to(my_pos, parede) <= 1:
                                 key = 'B'
                                 ways.append('B')
+
+                    # ha paredes            
                     elif state['walls'] != []:
                         print("Escolher parede alvo...")
                         print('my' + str(my_pos))
@@ -180,11 +189,30 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
 
                         elif oneils !=[]:
                             oneils.sort(key=lambda x: dist_to(my_pos, x['pos']))
+
+                            distToClosestEnemy = dist_to(my_pos, oneils[0]['pos'])
+                            print('DisToClosestEnemy: ' + str(distToClosestEnemy))
+                            
+                            # se tiver perto do inimigo incrementa o contador
+                            if distToClosestEnemy < 2.5:
+                                print('Perto do inimigo!')
+                                enemyCloseCounter += 1
+
+                            # nunca entra neste if
                             if in_range(my_pos, 0, oneils[0]['pos'], mapa):
                                 print('Enemie close! Pôr bomba! oneleas')
                                 key = 'B'
                                 ways.append('B')
-                        # anda até a parede
+
+                            # verificar ciclo com inimigo
+                            elif enemyCloseCounter > 20:
+                                print('Ciclo infinito encontrado!!!'.center(50, '-'))
+                                # vai para uma parede
+                                print('Encontrar caminho até à parede alvo: ' + str(wall))
+                                key,positions= choose_key(mapa, ways, my_pos, positions, wall, False)
+                                goal = wall
+
+                            # procura caminho para inimigo e parede
                             else:
                                 print('Encontrar caminho até à parede alvo: ' + str(oneils[0]['pos']) +', ' + str(wall))
                                 key,goal = choose_key2(mapa, ways, my_pos, positions, wall,oneils[0]['pos'], False)
@@ -204,7 +232,6 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                             limite +=1
                         else:
                             limite = 0'''
-
 
                 if state['enemies'] != [] and state['bombs'] == []:
                     ##17/10 - Fugir dos inimigos
