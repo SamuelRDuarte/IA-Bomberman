@@ -82,19 +82,22 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                     got_powerup = True
                     if level == 3:
                         detonador = True
-                
-                # verificar se tem bombpass
-                if my_pos == powerup:
-                    got_powerup = True
                     if level == 9:
                         bombpass = True
-
-                # verificar se tem wallpass
-                if my_pos == powerup:
-                    got_powerup = True
                     if level == 10:
                         wallpass = True
 
+                    
+                '''
+                #verificar se tem bombpass
+                if my_pos == powerup:
+                    got_powerup = True
+                    
+
+                # verificar se tem wallpass
+                if my_pos == powerup:
+                    got_powerup = True'''
+                    
                 # fuga recursiva
                 if state['bombs'] != [] and not calc_hide_pos:
                     print("calcurar hide pos")
@@ -134,7 +137,9 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                     else:
                         print("A ir para o [1,1]! ZWA")
                         change=True
-                        key=choose_move(my_pos,ways,[1,1])
+                        goal, calc_hide_pos = choose_hide_pos2(my_pos, state['bombs'][0], mapa, '', 0, 60, state['enemies'],detonador)
+                        print('nova hide pos: ',goal)
+                        key=choose_move(my_pos,ways,goal)
 
                 elif state['bombs'] == []:  # nao ha bombas
                     calc_hide_pos = False
@@ -154,6 +159,21 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                             distToClosestEnemy = dist_to(my_pos, oneils[0]['pos'])
                             print('DisToClosestEnemy: ' + str(distToClosestEnemy))
                             key = choose_move(my_pos,ways,oneils[0]['pos'])
+                            # se tiver perto do inimigo incrementa o contador
+                            if distToClosestEnemy < 2.5:
+                                print('Perto do inimigo!')
+                                enemyCloseCounter += 1
+
+                            elif enemyCloseCounter > 20:
+                                print('Ciclo infinito encontrado!!!'.center(50, '-'))
+                                # vai para uma parede
+                                #print('Encontrar caminho até à parede alvo: ' + str(wall))
+                                goal = [1,1]
+                                key = choose_move(my_pos,ways,goal)
+                                enemyCloseCounter = 0
+                                print('goal: ',goal)
+
+                            
 
                         elif dist_to(my_pos, (1, 1)) == 0:
                             print("going to kill enemies")
