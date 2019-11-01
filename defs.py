@@ -130,7 +130,7 @@ def choose_key(mapa, ways, my_pos, positions, goal, last_pos_wanted):
         return key, positions
 
     else: # pesquisar caminho
-        positions = astar(mapa.map, my_pos, goal)
+        positions = astar(mapa.map, my_pos, goal,mapa)
 
         if positions == [] or positions == None:
             return choose_move(my_pos,ways,goal),[]
@@ -158,16 +158,16 @@ def choose_key2(mapa, ways, my_pos, positions,wall, oneal, last_pos_wanted):
 
     else:  # pesquisar caminho
         if oneal is not None:
-            positions = astar(mapa.map, my_pos, oneal)
+            positions = astar(mapa.map, my_pos, oneal,mapa)
             if positions == [] or positions == None:
-                positions = astar(mapa.map,my_pos,wall)
+                positions = astar(mapa.map,my_pos,wall,mapa)
                 if positions == [] or positions == None:
                     # return choose_move(my_pos,ways,goal)
                     return choose_random_move(ways),''
                 goal = wall
             goal = oneal
         else:
-            positions = astar(mapa.map, my_pos, wall)
+            positions = astar(mapa.map, my_pos, wall,mapa)
             if positions == [] or positions == None:
                 # return choose_move(my_pos,ways,goal)
                 return '', ''

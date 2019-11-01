@@ -5,7 +5,7 @@ import websockets
 import getpass
 import os
 
-from defs2 import *
+from defs import *
 from mapa import Map
 from Node import *
 
@@ -35,7 +35,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
         detonador = False
         wallpass = False
         bombpass = False
-        change=True
+        change=False
         enemyCloseCounter = 0
         goal = []
 
@@ -112,7 +112,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                     key = choose_move(my_pos, ways, goal)
                     # key = choose_key(mapa, my_pos, positions, goal, True)
                     print('key hide pos in cacl:', key)
-                    change = True
+                    change = False
 
                 elif state['bombs'] != [] and calc_hide_pos:
                     print('já sabe a hide pos!')
@@ -121,7 +121,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                         if history[0] == history[1] and history[0] == history[2]:
                             change = True
 
-                    print('change: ' + change)
+                    print('change: ' , change)
 
                     '''
                     if len(history) > 11:
@@ -330,6 +330,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                         else:
                             key = 'B'
                             ways.append('B')
+                            samePosCounter = 0
                 else:
                     print('Reset samePosCounter!')
                     samePosCounter = 0
@@ -348,6 +349,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                 previous_level = state['level']
                 previous_lives = state['lives']
                 previous_key = key
+                previos_pos = my_pos
                 print('Sending key: ' + key + '\n\n')
                 print("got_powerup: ",got_powerup)
                 print('Detonador: ', detonador)
