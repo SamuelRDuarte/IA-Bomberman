@@ -31,6 +31,8 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
         got_powerup = False
         powerup = [0,0]
         detonador = False
+        wallpass = False
+        bombpass = False
         change=True
         enemyCloseCounter = 0
         goal = []
@@ -46,6 +48,8 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                 print(state)
                 # atualizar mapa
                 mapa._walls = state['walls']
+
+                level = state['level']
 
                 if previous_level != None and previous_lives != None:
                     # se morrer ou passar de nível faz reset às variáveis globais
@@ -63,16 +67,33 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                         goal = []
                         enemyCloseCounter = 0
 
+                # ignora powerups não utilizados
+                if level == 2 or level == 5 or level == 6 or level == 11 or level == 12 or level == 13 or level == 14:
+                    got_powerup = True
+
 
                 my_pos = state['bomberman']
                 ways = get_possible_ways(mapa, my_pos)
-                if my_pos == powerup:
-                    got_powerup = True
-                    if state['level'] == 3:
-                        detonador = True
-
                 print('ways: ', end='')
                 print(ways)
+
+                # verificar se tem detonador
+                if my_pos == powerup:
+                    got_powerup = True
+                    if level == 3:
+                        detonador = True
+                
+                # verificar se tem bombpass
+                if my_pos == powerup:
+                    got_powerup = True
+                    if level == 9:
+                        bombpass = True
+
+                # verificar se tem wallpass
+                if my_pos == powerup:
+                    got_powerup = True
+                    if level == 10:
+                        wallpass = True
 
                 # fuga recursiva
                 if state['bombs'] != [] and not calc_hide_pos:
@@ -277,6 +298,8 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                 print('Sending key: ' + key + '\n\n')
                 print("got_powerup: ",got_powerup)
                 print('Detonador: ', detonador)
+                print('Bombpass: ', bombpass)
+                print('Wallpass: ', wallpass)
 
                 await websocket.send(
                     json.dumps({"cmd": "key", "key": key})
