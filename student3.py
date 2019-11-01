@@ -33,6 +33,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
         detonador = False
         change=True
         enemyCloseCounter = 0
+        goal = []
 
         while True:
             try:
@@ -125,8 +126,16 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                     # só há inimigos vai para a posição [1,1]
                     if state['walls'] == [] and state['enemies'] != [] and state['powerups'] == []:
 
-                        print("going to kill enemies")
-                        if dist_to(my_pos, (1, 1)) == 0:
+                        oneils = [e for e in state['enemies'] if e['name'] in ['Oneal','Minvo','Kondoria','Ovapi','Pass']]
+                        if oneils !=[]:
+                            oneils.sort(key=lambda x: dist_to(my_pos, x['pos']))
+
+                            distToClosestEnemy = dist_to(my_pos, oneils[0]['pos'])
+                            print('DisToClosestEnemy: ' + str(distToClosestEnemy))
+                            key = choose_move(my_pos,ways,oneils[0]['pos'])
+
+                        elif dist_to(my_pos, (1, 1)) == 0:
+                            print("going to kill enemies")
                             ballooms = state['enemies']
                             ballooms.sort(key=lambda x: dist_to(my_pos, x['pos']))
                             if dist_to([1,1],ballooms[0]['pos']) < 6:
@@ -211,6 +220,8 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                                 print('Encontrar caminho até à parede alvo: ' + str(wall))
                                 key,positions= choose_key(mapa, ways, my_pos, positions, wall, False)
                                 goal = wall
+                                enemyCloseCounter = 0
+                                print('goal: ',goal)
 
                             # procura caminho para inimigo e parede
                             else:
@@ -222,6 +233,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                             print('Encontrar caminho até à parede alvo: ' + str(wall))
                             key,positions= choose_key(mapa, ways, my_pos, positions, wall, False)
                             goal = wall
+                            
 
                     '''if len(history)>=2:
                         if my_pos == history[-1]:
@@ -252,7 +264,11 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                 if key != '' or key == None:
                     if not key in ways:
                         print('Caminho impossivel... escolhendo novo')
-                        key = choose_move(my_pos, ways, goal)
+                        print('goal: ',goal)  #quando vai matar inimigos e entra em ciclo infinito o goal que passa é [], não sei porque
+                        if goal:
+                            key = choose_move(my_pos, ways, goal)
+                        else:
+                            #key = choose_move(my_pos,ways,next_wall(my_pos,state['walls']))
 
                 history.append(my_pos)
                 previous_level = state['level']
