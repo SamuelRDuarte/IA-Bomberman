@@ -178,8 +178,8 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
 
                     # ha paredes            
                     elif state['walls'] != []:
-                        print("Escolher parede alvo...")
-                        print('my' + str(my_pos))
+                        print("Há paredes...")
+                        print('my_pos: ' + str(my_pos))
 
 
                         if positions == []:
@@ -203,7 +203,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                             print('DisToClosestEnemy: ' + str(distToClosestEnemy))
                             
                             # se tiver perto do inimigo incrementa o contador
-                            if distToClosestEnemy < 2.5:
+                            if distToClosestEnemy < 3:
                                 print('Perto do inimigo!')
                                 enemyCloseCounter += 1
 
@@ -223,15 +223,20 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                                 enemyCloseCounter = 0
                                 print('goal: ',goal)
 
-                            # procura caminho para inimigo e parede
+                            # procura caminho para inimigo ou parede
                             else:
-                                print('Encontrar caminho até à parede alvo: ' + str(oneils[0]['pos']) +', ' + str(wall))
-                                key,goal = choose_key2(mapa, ways, my_pos, positions, wall,oneils[0]['pos'], False)
+                                print('Encontrar caminho até à alvo (choose_key3)...')
+                                key, positions, goal = choose_key3(mapa, ways, my_pos, positions, wall,oneils[0]['pos'], False)
+                                print('key from choose_key3: ' + key)
+                                print('positions: ' + str(positions))
+                                print("Alvo: " + str(goal))
 
 
                         else:
                             print('Encontrar caminho até à parede alvo: ' + str(wall))
-                            key,positions= choose_key(mapa, ways, my_pos, positions, wall, False)
+                            key, positions= choose_key(mapa, ways, my_pos, positions, wall, False)
+                            print('positions: ' + str(positions))
+                            print('key from choose_key: ' + key)
                             goal = wall
                             
 
@@ -263,7 +268,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                # garantir que key é válida
                 if key != '' or key == None:
                     if not key in ways:
-                        print('Caminho impossivel... escolhendo novo')
+                        print('Caminho impossivel... escolhendo novo'.center(50, '*'))
                         print('goal: ',goal)  #quando vai matar inimigos e entra em ciclo infinito o goal que passa é [], não sei porque
                         if goal:
                             key = choose_move(my_pos, ways, goal)

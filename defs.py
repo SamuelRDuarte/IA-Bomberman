@@ -109,37 +109,49 @@ def getKey(pos):
     if len(pos) != 2:
         return ''
     
-    if pos == (1,0):
+    if pos == [1,0]:
         return 'd'
-    elif pos == (-1,0):
+    elif pos == [-1,0]:
         return 'a'
-    elif pos == (0,1):
+    elif pos == [0,1]:
         return 's'
-    elif pos == (0,-1):
+    elif pos == [0,-1]:
         return 'w' 
+    else:
+        return ''
 
 def goToPosition(my_pos, next_pos):
+    print('goToPosition'.center(50, '-'))
+    print('my_pos: ' + str(my_pos))
+    print('next_pos: ' + str(next_pos))
+
     mx,my = my_pos
     nx,ny = next_pos
 
-    res = (nx-mx),(ny-my)
-    
+    res = [nx-mx, ny-my]
+    print('res: ' + str(res))
     return getKey(res)
 
 def choose_key(mapa, ways, my_pos, positions, goal, last_pos_wanted):
     # já sabe o caminho
     if positions != []:
+        while my_pos == positions[0]:
+            print('my_pos == next_pos')
+            positions.pop(0)
+
         key = goToPosition(my_pos, positions[0])
         positions.pop(0)
-        return key,positions
+        return key, positions
 
     else: # pesquisar caminho
         positions = astar(mapa.map, my_pos, goal)
         print('positions: ' + str(positions))
+
         if positions == [] or positions == None:
             print('Caminho nao encontrado...')
             return choose_move(my_pos,ways,goal),[]
             #return ''
+
         if len(positions) > 1:
             positions.pop(0)
 
@@ -188,6 +200,71 @@ def choose_key2(mapa, ways, my_pos, positions,wall, oneal, last_pos_wanted):
             return choose_move(my_pos, ways, goal),goal
 
         return goToPosition(my_pos, positions[0]),goal
+
+
+def choose_key3(mapa, ways, my_pos, positions, wall, oneal, last_pos_wanted):
+    # já sabe o caminho
+
+    if positions != []:
+        print('Não precisa de pesquisar...')
+        while dist_to(my_pos, positions[0]) == 0:
+            print('my_pos == next_pos')
+            positions.pop(0)
+
+        if dist_to(my_pos, positions[0]) > 1:
+            print("Next_pos invalida!!")
+            return choose_move(my_pos, ways, wall), [], wall
+
+        key = goToPosition(my_pos, positions[0])
+        goal = positions[-1]
+        positions.pop(0)
+        return key, positions, goal
+        '''
+        if positions:
+            return key, positions, positions[-1]
+        else:
+            return key, [], positions[-1]
+        '''
+
+    else:  # pesquisar caminho
+        if oneal is not None:
+            positions = astar(mapa.map, my_pos, oneal)
+            print('positions enemie: ' + str(positions))
+
+            if positions == [] or positions == None:
+                positions = astar(mapa.map,my_pos,wall)
+                print('positions wall: ' + str(positions))
+
+                if positions == [] or positions == None:
+                    print('Caminho nao encontrado...')
+                    return choose_move(my_pos,ways,wall), [], wall
+                    #return choose_random_move(ways),''
+                # caminho para parede
+                positions.pop(0)
+
+                return goToPosition(my_pos,positions[0]), positions, positions[-1]
+            
+            else:
+                # caminho para inimigo
+                positions.pop(0)
+                return goToPosition(my_pos, positions[0]), positions, positions[-1]
+        
+        else:
+            positions = astar(mapa.map, my_pos, wall)
+            print('positions wall: ' + str(positions))
+            
+            if positions == [] or positions == None:
+                print('Caminho nao encontrado...')
+                # return choose_move(my_pos,ways,goal)
+                return choose_move(my_pos,ways,wall), [], wall
+        
+        if len(positions)>1:
+            positions.pop(0)
+
+        if len(positions) <= 1 and last_pos_wanted:
+            return choose_move(my_pos, ways, wall), positions, wall
+
+        return goToPosition(my_pos, positions[0]), positions, wall
 
                
 
