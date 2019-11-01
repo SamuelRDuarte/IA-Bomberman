@@ -25,6 +25,8 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
         calc_hide_pos = False
         previous_level = None
         previous_lives = None
+        previos_pos = None
+        samePosCounter = 0
         positions = []
         history = []
         limite = 0
@@ -33,7 +35,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
         detonador = False
         wallpass = False
         bombpass = False
-        change=True
+        change=False
         enemyCloseCounter = 0
         goal = []
 
@@ -55,6 +57,8 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                     if previous_level != state['level']:
                         got_powerup = False
                         powerup = [0,0]
+                        previos_pos = None
+                        samePosCounter = 0
 
                     if previous_level != state['level'] or previous_lives != state['lives']:
                         calc_hide_pos = False
@@ -82,19 +86,21 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                         bombpass = True
                     if level == 10:
                         wallpass = True
+
                     
                 # fuga recursiva
                 if state['bombs'] != [] and not calc_hide_pos:
                     goal, calc_hide_pos = choose_hide_pos2(my_pos, state['bombs'][0], mapa, '', 0, 60, state['enemies'],detonador)
                     key = choose_move(my_pos, ways, goal)
                     # key = choose_key(mapa, my_pos, positions, goal, True)
-                    change = True
+                    change = False
 
                 elif state['bombs'] != [] and calc_hide_pos:
-                    if len(history) > 11:
-                        for i in range(0,10):
-                            if history[i] != history[i+1]:
-                                change= False
+
+                    if detonador:
+                        if history[0] == history[1] and history[0] == history[2]:
+                            change = True
+                   
 
                     if not change:
                         if dist_to(my_pos, goal) != 0:
@@ -105,10 +111,11 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                             if detonador:
                                 key = 'A'
                                 ways.append('A')
-                            else:
+                            else:                                
                                 key = ''
 
                     else:
+                        change = False
                         goal, calc_hide_pos = choose_hide_pos2(my_pos, state['bombs'][0], mapa, '', 0, 60, state['enemies'],detonador)
                         key=choose_move(my_pos,ways,goal)
 
@@ -127,10 +134,10 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                         if oneils !=[]:
                             oneils.sort(key=lambda x: dist_to(my_pos, x['pos']))
 
-                            distToClosestEnemy = dist_to(my_pos, oneils[0]['pos'])
+                            distToClosestEnemy = dist_to(my_pos, oneils[0]['pos'])                           
                             key = choose_move(my_pos,ways,oneils[0]['pos'])
                             # se tiver perto do inimigo incrementa o contador
-                            if distToClosestEnemy < 2.5:
+                            if distToClosestEnemy < 2.5:                              
                                 enemyCloseCounter += 1
 
                             elif enemyCloseCounter > 20:
@@ -183,9 +190,11 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
 
                     # ha paredes            
                     elif state['walls'] != []:
+
+
                         if positions == []:
                             wall = next_wall(my_pos, state['walls'])
-                                                
+
                         # por bomba se tiver perto da parede
                         if dist_to(my_pos, wall) <= 1:
                             key = 'B'
@@ -224,7 +233,6 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                         else:
                             key,positions= choose_key(mapa, ways, my_pos, positions, wall, False)
                             goal = wall
-                            
 
                 if state['enemies'] != [] and state['bombs'] == []:
                     ##17/10 - Fugir dos inimigos
@@ -239,6 +247,20 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                             key = 'B'
                             ways.append('B')
 
+                if my_pos == previos_pos:
+                    samePosCounter += 1
+                    if samePosCounter >= 250:
+                        if state['bombs'] != []:
+                            if detonador:
+                                key = 'A'
+                                ways.append('A')
+                        else:
+                            key = 'B'
+                            ways.append('B')
+                            samePosCounter = 0
+                else:
+                    samePosCounter = 0
+
                # garantir que key é válida
                 if key != '' or key == None:
                     if not key in ways:
@@ -251,6 +273,8 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                 previous_level = state['level']
                 previous_lives = state['lives']
                 previous_key = key
+                previos_pos = my_pos
+                
 
                 await websocket.send(
                     json.dumps({"cmd": "key", "key": key})
