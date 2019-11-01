@@ -5,7 +5,7 @@ import websockets
 import getpass
 import os
 
-from defs import *
+from defs2 import *
 from mapa import Map
 from Node import *
 
@@ -25,6 +25,8 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
         calc_hide_pos = False
         previous_level = None
         previous_lives = None
+        previos_pos = None
+        samePosCounter = 0
         positions = []
         history = []
         limite = 0
@@ -56,6 +58,8 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                     if previous_level != state['level']:
                         got_powerup = False
                         powerup = [0,0]
+                        previos_pos = None
+                        samePosCounter = 0
 
                     if previous_level != state['level'] or previous_lives != state['lives']:
                         print('RESET')
@@ -113,10 +117,18 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                 elif state['bombs'] != [] and calc_hide_pos:
                     print('já sabe a hide pos!')
 
+                    if detonador:
+                        if history[0] == history[1] and history[0] == history[2]:
+                            change = True
+
+                    print('change: ' + change)
+
+                    '''
                     if len(history) > 11:
                         for i in range(0,10):
                             if history[i] != history[i+1]:
                                 change= False
+                    '''
 
                     if not change:
                         if dist_to(my_pos, goal) != 0:
@@ -137,6 +149,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
 
                     else:
                         print("A ir para o [1,1]! ZWA")
+                        change = False
                         goal, calc_hide_pos = choose_hide_pos2(my_pos, state['bombs'][0], mapa, '', 0, 60, state['enemies'],detonador)
                         print('nova hide pos: ',goal)
                         key=choose_move(my_pos,ways,goal)
@@ -305,6 +318,21 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                             print('Enemie close! Pôr bomba!')
                             key = 'B'
                             ways.append('B')
+
+                if my_pos == previos_pos:
+                    samePosCounter += 1
+                    if samePosCounter >= 250:
+                        print('Suicidio'.center(80, '/'))
+                        if state['bombs'] != []:
+                            if detonador:
+                                key = 'A'
+                                ways.append('A')
+                        else:
+                            key = 'B'
+                            ways.append('B')
+                else:
+                    print('Reset samePosCounter!')
+                    samePosCounter = 0
 
                # garantir que key é válida
                 if key != '' or key == None:
