@@ -47,7 +47,8 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
 
                 print(state)
                 # atualizar mapa
-                mapa._walls = state['walls']
+                if state['walls']:
+                    mapa._walls = state['walls']
 
                 level = state['level']
 
@@ -108,7 +109,6 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                     key = choose_move(my_pos, ways, goal)
                     # key = choose_key(mapa, my_pos, positions, goal, True)
                     print('key hide pos in cacl:', key)
-                    change = True
 
                 elif state['bombs'] != [] and calc_hide_pos:
                     print('já sabe a hide pos!')
@@ -137,6 +137,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
 
                     else:
                         print("A ir para o [1,1]! ZWA")
+                        change=True
                         goal, calc_hide_pos = choose_hide_pos2(my_pos, state['bombs'][0], mapa, '', 0, 60, state['enemies'],detonador)
                         print('nova hide pos: ',goal)
                         key=choose_move(my_pos,ways,goal)
@@ -236,11 +237,6 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                             print('Cheguei à parede! Pôr bomba!')
                             key = 'B'
                             ways.append('B')
-                        #para apanhar o detonator
-                        elif state['level'] == 3 and len(oneils) == 1 and not detonador:
-                            print('Encontrar caminho até à parede alvo, só 1 enemie: ' + str(wall))
-                            key,positions= choose_key(mapa, ways, my_pos, positions, wall, False)
-                            goal = wall
 
                         elif oneils !=[]:
                             oneils.sort(key=lambda x: dist_to(my_pos, x['pos']))
@@ -343,3 +339,49 @@ SERVER = os.environ.get("SERVER", "localhost")
 PORT = os.environ.get("PORT", "8000")
 NAME = os.environ.get("NAME", getpass.getuser())
 loop.run_until_complete(agent_loop(f"{SERVER}:{PORT}", NAME))
+
+
+
+#choose key para os enemies 
+#positions ==[]
+#choose key para os enemies
+
+def choose_key2(mapa, ways, my_pos, positions,wall, oneal, last_pos_wanted):
+    # já sabe o caminho
+
+    if positions != []:
+        key = goToPosition(my_pos, positions[0])
+        positions.pop(0)
+        if positions:
+            return key,positions[-1]
+        else:
+            return key,[]
+
+    else:  # pesquisar caminho
+        if oneal is not None:
+            positions = astar(mapa.map, my_pos, oneal)
+            print('positions enemie: ' + str(positions))
+            if positions == [] or positions == None:
+                positions = astar(mapa.map,my_pos,wall)
+                print('positions wall: ' + str(positions))
+                if positions == [] or positions == None:
+                    print('Caminho nao encontrado...')
+                    # return choose_move(my_pos,ways,goal)
+                    return choose_move(my_pos,ways,wall),''
+                goal = wall
+            goal = oneal
+        else:
+            positions = astar(mapa.map, my_pos, wall)
+            print('positions wall: ' + str(positions))
+            if positions == [] or positions == None:
+                print('Caminho nao encontrado...')
+                # return choose_move(my_pos,ways,goal)
+                return '', ''
+            goal = wall
+        if len(positions)>1:
+            positions.pop(0)
+
+        if len(positions) <= 1 and last_pos_wanted:
+            return choose_move(my_pos, ways, goal),goal
+
+        return goToPosition(my_pos, positions[0]),goal

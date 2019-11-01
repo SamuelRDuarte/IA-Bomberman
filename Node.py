@@ -86,7 +86,7 @@ def astar(maze, start, end):
 
             # Append
             children.append(new_node)
-            print('New node!')
+            #print('New node!')
 
         # Loop through children
         for child in children:
@@ -108,7 +108,7 @@ def astar(maze, start, end):
 
             # Add the child to the open list
             open_list.append(child)
-            print('Adicionar à lista de nos abertos')
+            #print('Adicionar à lista de nos abertos')
             count_open_nodes += 1
             if count_open_nodes > 50:
                 return []
