@@ -268,7 +268,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                         if goal:
                             key = choose_move(my_pos, ways, goal)
                         else:
-                            #key = choose_move(my_pos,ways,next_wall(my_pos,state['walls']))
+                            key = choose_move(my_pos,ways,next_wall(my_pos,state['walls']))
 
                 history.append(my_pos)
                 previous_level = state['level']
