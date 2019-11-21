@@ -33,13 +33,6 @@ def get_possible_ways2(mapa, position):
     ways = []
 
     x, y = position
-    #print(mapa.map)
-    print(position)
-    print('direita: ' + str(mapa.map[x + 1][y]) + ' baixo: ' + str(mapa.map[x][y + 1]) + ' esquerda: ' + str(
-        mapa.map[x - 1][y]) + ' cima: ' + str(mapa.map[x][y - 1]))
-
-    print((x, y+1) in mapa._walls)
-    print([x, y+1] in mapa._walls)
     
     if not mapa.is_blocked([x+1, y]):
         
@@ -61,20 +54,19 @@ def get_possible_ways(mapa, position):
     ways = []
 
     x, y = position
-    print('direita:'+str(mapa.map[x+1][y])+'baixo:'+str(mapa.map[x][y+1])+'esquerda:'+str(mapa.map[x-1][y])+'cima:'+str(mapa.map[x][y-1]))
     
     tile1 = mapa.map[x+1][y]
     tile2 = mapa.map[x-1][y]
     tile3 = mapa.get_tile((x,y+1))
     tile4 = mapa.get_tile((x,y-1))
 
-    if tile1 != 1 and not (x+1,y) in mapa.walls:
+    if tile1 != 1 and not [x+1,y] in mapa._walls:
         ways.append('d')
-    if tile3 != 1 and not (x,y+1) in mapa.walls:
+    if tile3 != 1 and not [x,y+1] in mapa._walls:
         ways.append('s')
-    if tile2 != 1 and not (x-1,y) in mapa.walls:
+    if tile2 != 1 and not [x-1,y] in mapa._walls:
         ways.append('a')
-    if tile4 != 1 and not (x,y-1) in mapa.walls:
+    if tile4 != 1 and not [x,y-1] in mapa._walls:
         ways.append('w')
 
     return ways
@@ -121,22 +113,16 @@ def getKey(pos):
         return ''
 
 def goToPosition(my_pos, next_pos):
-    print('goToPosition'.center(50, '-'))
-    print('my_pos: ' + str(my_pos))
-    print('next_pos: ' + str(next_pos))
-
     mx,my = my_pos
     nx,ny = next_pos
 
     res = [nx-mx, ny-my]
-    print('res: ' + str(res))
     return getKey(res)
 
 def choose_key(mapa, ways, my_pos, positions, goal, last_pos_wanted):
     # já sabe o caminho
     if positions != []:
         while my_pos == positions[0]:
-            print('my_pos == next_pos')
             positions.pop(0)
 
         key = goToPosition(my_pos, positions[0])
@@ -144,11 +130,9 @@ def choose_key(mapa, ways, my_pos, positions, goal, last_pos_wanted):
         return key, positions
 
     else: # pesquisar caminho
-        positions = astar(mapa.map, my_pos, goal, mapa)
-        print('positions: ' + str(positions))
+        positions = astar(mapa.map, my_pos, goal,mapa)
 
         if positions == [] or positions == None:
-            print('Caminho nao encontrado...')
             return choose_move(my_pos,ways,goal),[]
             #return ''
 
@@ -161,7 +145,7 @@ def choose_key(mapa, ways, my_pos, positions, goal, last_pos_wanted):
         return goToPosition(my_pos, positions[0]),positions
 
 
-def choose_key2(mapa, ways, my_pos, positions, wall, oneal, last_pos_wanted):
+def choose_key2(mapa, ways, my_pos, positions,wall, oneal, last_pos_wanted):
     # já sabe o caminho
 
     if positions != []:
@@ -174,22 +158,17 @@ def choose_key2(mapa, ways, my_pos, positions, wall, oneal, last_pos_wanted):
 
     else:  # pesquisar caminho
         if oneal is not None:
-            positions = astar(mapa.map, my_pos, oneal)
-            print('positions enemie: ' + str(positions))
+            positions = astar(mapa.map, my_pos, oneal, mapa)
             if positions == [] or positions == None:
-                positions = astar(mapa.map, my_pos, wall)
-                print('positions wall: ' + str(positions))
+                positions = astar(mapa.map,my_pos,wall,mapa)
                 if positions == [] or positions == None:
-                    print('Caminho nao encontrado...')
                     # return choose_move(my_pos,ways,goal)
                     return choose_random_move(ways),''
                 goal = wall
             goal = oneal
         else:
-            positions = astar(mapa.map, my_pos, wall)
-            print('positions wall: ' + str(positions))
+            positions = astar(mapa.map, my_pos, wall,mapa)
             if positions == [] or positions == None:
-                print('Caminho nao encontrado...')
                 # return choose_move(my_pos,ways,goal)
                 return '', ''
             goal = wall
@@ -206,73 +185,41 @@ def choose_key3(mapa, ways, my_pos, positions, wall, oneal, last_pos_wanted):
     # já sabe o caminho
 
     if positions != []:
-        print('Não precisa de pesquisar...')
-        print('positions: ' + str(positions))
+        while dist_to(my_pos, positions[0]) == 0:
+            positions.pop(0)
 
         if dist_to(my_pos, positions[0]) > 1:
-            print("Next_pos invalida!!")
             return choose_move(my_pos, ways, wall), [], wall
 
         key = goToPosition(my_pos, positions[0])
         goal = positions[-1]
         positions.pop(0)
         return key, positions, goal
-        '''
-        if positions:
-            return key, positions, positions[-1]
-        else:
-            return key, [], positions[-1]
-        '''
 
     else:  # pesquisar caminho
-        # procura caminho para inimigo
         if oneal is not None:
-            # procura caminho para o inimigo
-            positions = astar(mapa.map, my_pos, oneal, mapa)
-            print('positions enemie: ' + str(positions))
+            positions = astar(mapa.map, my_pos, oneal)
 
-            # se nao encontra caminho para o inimigo
-            # então procura caminho para a parede
             if positions == [] or positions == None:
-                print('Caminho nao encontrado para o inimigo...')
-                positions = astar(mapa.map, my_pos, wall, mapa)
-                print('positions wall: ' + str(positions))
+                positions = astar(mapa.map, my_pos, wall)
 
-                # nao encontra caminho para a parede
                 if positions == [] or positions == None:
-                    print('Caminho nao encontrado para a parede...')
-                    # usa outra função para encontrar caminho
                     return choose_move(my_pos, ways, wall), [], wall
-
+                    #return choose_random_move(ways),''
                 # caminho para parede
+                positions.pop(0)
 
-                # se a proxima posiçao for igual à minha posiçao atual
-                while dist_to(my_pos, positions[0]) == 0:
-                    print('my_pos == next_pos')
-                    print('apagar posições inuteis')
-                    positions.pop(0)
-
-                # positions.pop(0)                # *Problemas*
                 return goToPosition(my_pos,positions[0]), positions, positions[-1]
             
             else:
                 # caminho para inimigo
-                # se a proxima posiçao for igual à minha posiçao atual
-                while dist_to(my_pos, positions[0]) == 0:
-                    print('my_pos == next_pos')
-                    print('apagar posições inuteis')
-                    positions.pop(0)
-
-                # positions.pop(0)
+                positions.pop(0)
                 return goToPosition(my_pos, positions[0]), positions, positions[-1]
         
-
-        else: # procura caminho para parede (ja nao ha inimigos)
+        else:
             positions = astar(mapa.map, my_pos, wall)
-            print('positions wall: ' + str(positions))
             
             if positions == [] or positions == None:
-                print('Caminho nao encontrado...')
                 # return choose_move(my_pos,ways,goal)
                 return choose_move(my_pos,ways,wall), [], wall
         
@@ -377,7 +324,6 @@ def bomb_and_run(bomberman_pos, enemy, range,inimigos,mapa,ways):
         lista=[e for e in inimigos if e['name']== enemy]
         lista.sort(key = lambda x: dist_to(bomberman_pos,x['pos']))
         if in_range(bomberman_pos, range, lista[0]['pos'], mapa):
-            print('Enemie close! Pôr bomba!')
             key = 'B'
             ways.append('B')
 
@@ -386,11 +332,7 @@ def bomb_and_run(bomberman_pos, enemy, range,inimigos,mapa,ways):
 def choose_hide_pos(bomberman_pos, bomb, mapa, previous_key, n, limit,enemies,detonador):
     x,y = bomberman_pos
 
-    print('limite: ' + str(limit))
-    print('n: ' + str(n))
-
     ord_enemies = closer_enemies(bomberman_pos, enemies)
-    print('\n\nord_enemies' + str(ord_enemies))
     #print("enemie close: ",ord_enemies[0])
     if detonador:
         raio = 1
@@ -398,57 +340,36 @@ def choose_hide_pos(bomberman_pos, bomb, mapa, previous_key, n, limit,enemies,de
         raio = 4
 
     if not in_range(bomberman_pos, bomb[2], bomb[0], mapa) and not in_range(bomberman_pos,raio, ord_enemies[0][1], mapa):
-        print("Posicao segura!")
         return (bomberman_pos, True)
 
 
     if n == limit:
-        print('\n\n\n\nLimite recursivo...')
         if bomberman_pos != bomb:
-            print('Posicao encontrada nao é segura!')
             return (bomb[0], False)
         else:
             return ([1,1], False)
 
     ways = get_possible_ways(mapa, bomberman_pos)
-    #print(repr(mapa.map))
-    print("DEBUG: ways: " + repr(ways) + ", prev: " + previous_key)
 
     if previous_key in ['a', 'd']: # andou para o lado, experimenta para o cima/baixo
-        print("andou para lado ckecking cima")
         if 'w' in ways and not in_range(bomberman_pos,0, ord_enemies[0][1], mapa):
-            print("andou para lado resultou cima")
             return choose_hide_pos([x, y - 1], bomb, mapa, 'w', n + 1, limit,enemies,detonador)
-        print("andou para lado ckecking baixo")
         if 's' in ways and not in_range(bomberman_pos,0, ord_enemies[0][1], mapa):
-            print("andou para lado resultou baixo")
             return choose_hide_pos([x,y+1], bomb, mapa, 's', n+1, limit,enemies,detonador)
 
     if previous_key in ['w', 's']: # andou na vertical, experimenta para os lados
-        print("andou na vertical  ckecking direita")
         if 'd' in ways and not in_range(bomberman_pos,0, ord_enemies[0][1], mapa):
-            print("andou na vertical  resultou direita")
             return choose_hide_pos([x + 1, y], bomb, mapa, 'd', n+1, limit,enemies,detonador)
-        print("andou na vertical  ckecking esquerda")
         if 'a' in ways and not in_range(bomberman_pos,0, ord_enemies[0][1], mapa):
-            print("andou na vertical resultou esquerda")
             return choose_hide_pos([x - 1, y], bomb, mapa, 'a', n + 1, limit,enemies,detonador)
             
-    print("checking direita")
     if 'd' in ways and not in_range(bomberman_pos,0, ord_enemies[0][1], mapa):
-        print("resultou direita")
         return choose_hide_pos([x + 1, y], bomb, mapa, 'd', n+1, limit,enemies,detonador)
-    print("checking cima")
     if 'w' in ways and not in_range(bomberman_pos,0, ord_enemies[0][1], mapa):
-        print("resultou cima")
         return choose_hide_pos([x, y - 1], bomb, mapa, 'w', n + 1, limit,enemies,detonador)
-    print("checking esquerda")
     if 'a' in ways and not in_range(bomberman_pos,0, ord_enemies[0][1], mapa):
-        print("resultou esquerda")
         return choose_hide_pos([x - 1, y], bomb, mapa, 'a', n + 1, limit,enemies,detonador)
-    print("checking baixo")
     if 's' in ways and not in_range(bomberman_pos,0, ord_enemies[0][1], mapa):
-        print("resultou baixo")
         return choose_hide_pos([x, y + 1], bomb, mapa, 's', n+1, limit,enemies,detonador)
 
     
@@ -461,11 +382,7 @@ def choose_hide_pos(bomberman_pos, bomb, mapa, previous_key, n, limit,enemies,de
 def choose_hide_pos2(bomberman_pos, bomb, mapa, previous_key, n, limit,enemies,detonador):
     x,y = bomberman_pos
 
-    print('limite: ' + str(limit))
-    print('n: ' + str(n))
     ord_enemies = closer_enemies(bomberman_pos, enemies)
-    print('\n\nord_enemies' + str(ord_enemies))
-    #print("enemie close: ", ord_enemies[0])
 
     if detonador:
         raio = 1
@@ -473,52 +390,32 @@ def choose_hide_pos2(bomberman_pos, bomb, mapa, previous_key, n, limit,enemies,d
         raio = 4
 
     if not in_range(bomberman_pos, bomb[2], bomb[0], mapa)and not in_range(bomberman_pos,raio, ord_enemies[0][1], mapa) :
-        print("Posicao segura!")
         return (bomberman_pos, True)
 
     if n == limit:
-        print('\n\n\n\nLimite recursivo...going to 2 recursive')
         return choose_hide_pos(bomberman_pos,bomb,mapa,'',0,70,enemies,detonador)
 
     ways = get_possible_ways(mapa, bomberman_pos)
-    #print(repr(mapa.map))
-    print("DEBUG: ways: " + repr(ways) + ", prev: " + previous_key)
 
     if previous_key in ['a', 'd']: # andou para o lado, experimenta para o cima/baixo
-        print("andou para lado ckecking baixo")
-        if 's' in ways and not in_range(bomberman_pos,0, ord_enemies[0][1], mapa):
-            print("andou para lado resultou baixo")           
+        if 's' in ways and not in_range(bomberman_pos,0, ord_enemies[0][1], mapa):         
             return choose_hide_pos2([x,y+1], bomb, mapa, 's', n+1, limit,enemies,detonador)
-        print("andou para lado ckecking cima")
         if 'w' in ways and not in_range(bomberman_pos,0, ord_enemies[0][1], mapa):
-            print("andou para lado resultou cima")
             return choose_hide_pos2([x, y - 1], bomb, mapa, 'w', n+1, limit,enemies,detonador)
 
     if previous_key in ['w', 's']: # andou na vertical, experimenta para os lados
-        print("andou na vertical  ckecking esquerda")
         if 'a' in ways and not in_range(bomberman_pos,0, ord_enemies[0][1], mapa):
-            print("andou na vertical resultou esquerda")
             return choose_hide_pos2([x-1,y], bomb, mapa, 'a', n+1, limit,enemies,detonador)
-        print("andou na vertical  ckecking direita")
         if 'd' in ways and not in_range(bomberman_pos,0, ord_enemies[0][1], mapa):
-            print("andou na vertical  resultou direita")
             return choose_hide_pos2([x + 1, y], bomb, mapa, 'd', n+1, limit, enemies,detonador)
 
-    print("checking baixo")
     if 's' in ways and not in_range(bomberman_pos,0, ord_enemies[0][1], mapa):
-        print("resultou baixo")
         return choose_hide_pos2([x, y + 1], bomb, mapa, 's', n+1, limit,enemies,detonador)
-    print("checking cima")
     if 'w' in ways and not in_range(bomberman_pos,0, ord_enemies[0][1], mapa):
-        print("resultou cima")
         return choose_hide_pos2([x, y - 1], bomb, mapa, 'w', n+1, limit,enemies,detonador)
-    print("checking esquerda")
     if 'a' in ways and not in_range(bomberman_pos,0, ord_enemies[0][1], mapa):
-        print("resultou esquerda")
         return choose_hide_pos2([x-1,y], bomb, mapa, 'a', n+1, limit,enemies,detonador)
-    print("checking direita")
     if 'd' in ways and not in_range(bomberman_pos,0, ord_enemies[0][1], mapa):
-        print("resultou direita")
         return choose_hide_pos2([x + 1, y], bomb, mapa, 'd', n+1, limit,enemies,detonador)
     else:
         return choose_hide_pos(bomb[0],bomb,mapa,previous_key,n+1,limit,enemies,detonador)
@@ -558,84 +455,66 @@ def avoid(my_pos,en_pos,mapa):
 
     if en_pos[0]>my_pos[0]:                                             #Inimigo à direita
         if not Map.is_blocked(mapa,[my_pos[0]-1,my_pos[1]]):                       #BOmberman vai à esquerda
-            print("ESQUERDA")
             return 'a'
         else:                                                           #Pedra à esquerda
             if en_pos[1]>my_pos[1]:                                     #Inimigo abaixo
                 if not Map.is_blocked(mapa,[my_pos[0], my_pos[1]-1]):              #Bomberman para cima
-                    print("CIMA")
                     return 'w'
             elif en_pos[1] < my_pos[1]:  # Inimigo acima
                 if not Map.is_blocked(mapa, [my_pos[0], my_pos[1] + 1]):  # Bomberman para baixo
-                    print("BAIXO")
                     return 's'
                 else:
-                    print("rip")
+                    return ''
 
             else:                                                       # INIMIGO NO MESMO NIVEL
                 if not Map.is_blocked(mapa, [my_pos[0], my_pos[1] - 1]):  # Bomberman para cima
-                    print("CIMA")
                     return 'w'
                 else:
-                    print("BAIXO")
                     return 's'
 
 
     elif en_pos[0]<my_pos[0]:                                                               #Inimigo à esquerda
         if not Map.is_blocked(mapa,[my_pos[0] + 1, my_pos[1]]):  # BOmberman vai à direita
-            print("DIREITA")
             return 'd'
         else:                                                   # Pedra à direita
             if en_pos[1] > my_pos[1]:  # Inimigo abaixo
                 if not Map.is_blocked(mapa,[my_pos[0], my_pos[1] - 1]):  # Bomberman para cima
-                    print("CIMA")
                     return 'w'
                 else:
-                    print("rip")
                     return ''
 
             elif en_pos[1] < my_pos[1]:
                 if not Map.is_blocked(mapa,[my_pos[0], my_pos[1] + 1]):  # Bomberman para baixo
-                    print("BAIXO")
                     return 's'
                 else:
-                    print("rip")
                     return ''
 
 
             else:  # Inimigo NO MESMO NIVEL
                 if not Map.is_blocked(mapa,[my_pos[0], my_pos[1] - 1]):  # Bomberman para cima
-                    print("CIMA")
                     return 'w'
                 else:
-                    print("BAIXO")
                     return 's'
 
 
     else:                                                               #INIMIGO EM LINHA
         if en_pos[1] > my_pos[1]:  # Inimigo acima
             if not Map.is_blocked(mapa, [my_pos[0], my_pos[1] - 1]):  # Bomberman para cima
-                print("CIMA")
                 return 'w'
             else:
-                print("rip")
                 return ''
 
         elif en_pos[1] < my_pos[1]:
             if not Map.is_blocked(mapa, [my_pos[0], my_pos[1] +  1]):  # Bomberman para baixo
-                print("BAIXO")
                 return 's'
             else:
-                print("rip")
                 return ''
 
 
         else:  # Inimigo NO MESMO NIVEL
             if not Map.is_blocked(mapa, [my_pos[0], my_pos[1] - 1]):  # Bomberman para cima
-                print("CIMA")
                 return 'w'
             else:
-                print("BAIXO")
                 return 's'
 
 

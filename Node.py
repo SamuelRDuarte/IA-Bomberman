@@ -1,6 +1,10 @@
 # source: https://medium.com/@nicholas.w.swift/easy-a-star-pathfinding-7e6689c7f7b2
 import math
 
+# IMPLEMENTAR
+# para parede pesquisa 1x
+# para inimigos pesquisa todas as iterações
+
 class Node:
     def __init__(self, parent=None, position=None):
         self.parent = parent
