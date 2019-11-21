@@ -18,7 +18,7 @@ class Node:
         return math.pow((self.position[0] - pos.position[0]), 2) + math.pow((self.position[1] - pos.position[1]), 2)
 
 
-def astar(maze, start, end,mapa):
+def astar(maze, start, end, mapa):
     """Returns a list of tuples as a path from the given start to the given end in the given maze"""
 
     # Create start and end node
@@ -73,7 +73,7 @@ def astar(maze, start, end,mapa):
                 continue
 
             # Make sure walkable terrain
-            if node_position in mapa._walls or mapa.is_stone(node_position):
+            if node_position in mapa.walls or mapa.is_stone(node_position):
             #if maze.getTile(node_position):
                 continue
 
@@ -110,7 +110,7 @@ def astar(maze, start, end,mapa):
             open_list.append(child)
             #print('Adicionar à lista de nos abertos')
             count_open_nodes += 1
-            if count_open_nodes > 50:
+            if count_open_nodes > 80:
                 return []
 
 

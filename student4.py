@@ -5,7 +5,7 @@ import websockets
 import getpass
 import os
 
-from defs import *
+from defs2 import *
 from mapa import Map
 from Node import *
 
@@ -45,7 +45,8 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
 
                 print(state)
                 # atualizar mapa
-                mapa._walls = state['walls']
+                mapa.walls = state['walls']
+                print(mapa.walls)
 
                 if previous_level != None and previous_lives != None:
                     # se morrer ou passar de nível faz reset às variáveis globais
@@ -146,7 +147,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                         else:
                             # key = goto(my_pos,(1,1))
                             # key = choose_move(my_pos, ways, [1, 1])
-                            key,positions = choose_key(mapa, ways, my_pos, positions, [1, 1], True)
+                            key,positions = choose_key(mapa, ways, my_pos, positions, list(mapa.bomberman_spawn), True)
                             goal = [1,1]
 
                     # apanhar powerups
@@ -226,7 +227,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                             # procura caminho para inimigo ou parede
                             else:
                                 print('Encontrar caminho até à alvo (choose_key3)...')
-                                key, positions, goal = choose_key3(mapa, ways, my_pos, positions, wall,oneils[0]['pos'], False)
+                                key, positions, goal = choose_key3(mapa, ways, my_pos, positions, wall, oneils[0]['pos'], False)
                                 print('key from choose_key3: ' + key)
                                 print('positions: ' + str(positions))
                                 print("Alvo: " + str(goal))
@@ -234,7 +235,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
 
                         else:
                             print('Encontrar caminho até à parede alvo: ' + str(wall))
-                            key, positions= choose_key(mapa, ways, my_pos, positions, wall, False)
+                            key, positions = choose_key(mapa, ways, my_pos, positions, wall, False)
                             print('positions: ' + str(positions))
                             print('key from choose_key: ' + key)
                             goal = wall

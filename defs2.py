@@ -68,13 +68,13 @@ def get_possible_ways(mapa, position):
     tile3 = mapa.get_tile((x,y+1))
     tile4 = mapa.get_tile((x,y-1))
 
-    if tile1 != 1 and not [x+1,y] in mapa._walls:
+    if tile1 != 1 and not (x+1,y) in mapa.walls:
         ways.append('d')
-    if tile3 != 1 and not [x,y+1] in mapa._walls:
+    if tile3 != 1 and not (x,y+1) in mapa.walls:
         ways.append('s')
-    if tile2 != 1 and not [x-1,y] in mapa._walls:
+    if tile2 != 1 and not (x-1,y) in mapa.walls:
         ways.append('a')
-    if tile4 != 1 and not [x,y-1] in mapa._walls:
+    if tile4 != 1 and not (x,y-1) in mapa.walls:
         ways.append('w')
 
     return ways
@@ -144,7 +144,7 @@ def choose_key(mapa, ways, my_pos, positions, goal, last_pos_wanted):
         return key, positions
 
     else: # pesquisar caminho
-        positions = astar(mapa.map, my_pos, goal)
+        positions = astar(mapa.map, my_pos, goal, mapa)
         print('positions: ' + str(positions))
 
         if positions == [] or positions == None:
@@ -161,7 +161,7 @@ def choose_key(mapa, ways, my_pos, positions, goal, last_pos_wanted):
         return goToPosition(my_pos, positions[0]),positions
 
 
-def choose_key2(mapa, ways, my_pos, positions,wall, oneal, last_pos_wanted):
+def choose_key2(mapa, ways, my_pos, positions, wall, oneal, last_pos_wanted):
     # já sabe o caminho
 
     if positions != []:
@@ -177,7 +177,7 @@ def choose_key2(mapa, ways, my_pos, positions,wall, oneal, last_pos_wanted):
             positions = astar(mapa.map, my_pos, oneal)
             print('positions enemie: ' + str(positions))
             if positions == [] or positions == None:
-                positions = astar(mapa.map,my_pos,wall)
+                positions = astar(mapa.map, my_pos, wall)
                 print('positions wall: ' + str(positions))
                 if positions == [] or positions == None:
                     print('Caminho nao encontrado...')
@@ -228,19 +228,19 @@ def choose_key3(mapa, ways, my_pos, positions, wall, oneal, last_pos_wanted):
 
     else:  # pesquisar caminho
         if oneal is not None:
-            positions = astar(mapa.map, my_pos, oneal)
+            positions = astar(mapa.map, my_pos, oneal, mapa)
             print('positions enemie: ' + str(positions))
 
             if positions == [] or positions == None:
-                positions = astar(mapa.map,my_pos,wall)
+                positions = astar(mapa.map, my_pos, wall, mapa)
                 print('positions wall: ' + str(positions))
 
                 if positions == [] or positions == None:
                     print('Caminho nao encontrado...')
-                    return choose_move(my_pos,ways,wall), [], wall
+                    return choose_move(my_pos, ways, wall), [], wall
                     #return choose_random_move(ways),''
                 # caminho para parede
-                positions.pop(0)
+                positions.pop(0)                # *Problemas*
 
                 return goToPosition(my_pos,positions[0]), positions, positions[-1]
             

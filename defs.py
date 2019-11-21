@@ -158,7 +158,7 @@ def choose_key2(mapa, ways, my_pos, positions,wall, oneal, last_pos_wanted):
 
     else:  # pesquisar caminho
         if oneal is not None:
-            positions = astar(mapa.map, my_pos, oneal,mapa)
+            positions = astar(mapa.map, my_pos, oneal, mapa)
             if positions == [] or positions == None:
                 positions = astar(mapa.map,my_pos,wall,mapa)
                 if positions == [] or positions == None:
@@ -201,10 +201,10 @@ def choose_key3(mapa, ways, my_pos, positions, wall, oneal, last_pos_wanted):
             positions = astar(mapa.map, my_pos, oneal)
 
             if positions == [] or positions == None:
-                positions = astar(mapa.map,my_pos,wall)
+                positions = astar(mapa.map, my_pos, wall)
 
                 if positions == [] or positions == None:
-                    return choose_move(my_pos,ways,wall), [], wall
+                    return choose_move(my_pos, ways, wall), [], wall
                     #return choose_random_move(ways),''
                 # caminho para parede
                 positions.pop(0)
