@@ -46,6 +46,10 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                     await websocket.recv()
                 )  # receive game state, this must be called timely or your game will get out of sync with the server
                 # Next lines are only for the Human Agent, the key values are nonetheless the correct ones!
+
+                if state['level'] == 15 and state['enemies'] == []:
+                    return 0
+
                 key = ""
 
                 print(state)
@@ -163,16 +167,20 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                     else:
                         enemies = [e for e in state['enemies'] if e['name'] in ['Oneal','Minvo','Kondoria','Ovapi','Pass']]
 
-                    # só há inimigos vai para a posição [1,1]
+                    # só há inimigos vai atras deles
                     if state['walls'] == [] and state['enemies'] != [] and state['powerups'] == []:
 
-                        enemies = [e for e in state['enemies'] if e['name'] in ['Oneal','Minvo','Kondoria','Ovapi','Pass']]
+                        enemies = state['enemies']
+                        
                         if enemies !=[]:
                             enemies.sort(key=lambda x: dist_to(my_pos, x['pos']))
 
                             distToClosestEnemy = dist_to(my_pos, enemies[0]['pos'])
                             print('DisToClosestEnemy: ' + str(distToClosestEnemy))
-                            key = choose_move(my_pos,ways,enemies[0]['pos'])
+                            print('enemy_pos: ' + str(enemies[0]['pos']))
+                            key = pathToEnemy(mapa, my_pos, enemies[0]['pos'])
+                            goal = enemies[0]['pos']
+
                             # se tiver perto do inimigo incrementa o contador
                             if distToClosestEnemy < 2.5:
                                 print('Perto do inimigo!')
@@ -182,18 +190,18 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                                 print('Ciclo infinito encontrado!!!'.center(50, '-'))
                                 # vai para uma parede
                                 #print('Encontrar caminho até à parede alvo: ' + str(wall))
-                                goal = [1,1]
+                                goal = list(mapa.bomberman_spawn)
                                 key = choose_move(my_pos,ways,goal)
                                 enemyCloseCounter = 0
                                 print('goal: ',goal)
 
                             
-
+                        '''
                         elif dist_to(my_pos, (1, 1)) == 0:
                             print("going to kill enemies")
-                            ballooms = state['enemies']
-                            ballooms.sort(key=lambda x: dist_to(my_pos, x['pos']))
-                            if dist_to([1,1],ballooms[0]['pos']) < 6:
+                            enemies = state['enemies']
+                            enemies.sort(key=lambda x: dist_to(my_pos, x['pos']))
+                            if dist_to([1,1],enemies[0]['pos']) < 6:
                                 key = 'B'
                                 ways.append('B')
                             else:
@@ -203,6 +211,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                             # key = choose_move(my_pos, ways, [1, 1])
                             key, positions = choose_key(mapa, ways, my_pos, positions, list(mapa.bomberman_spawn), True)
                             goal = list(mapa.bomberman_spawn)
+                        '''
 
                     # apanhar powerups
                     elif state['powerups'] != []:
@@ -317,15 +326,15 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
 
                 if state['enemies'] != [] and state['bombs'] == []:
                     ##17/10 - Fugir dos inimigos
-                    ballooms = state['enemies']
-                    ballooms.sort(key=lambda x: dist_to(my_pos, x['pos']))
+                    enemies = state['enemies']
+                    enemies.sort(key=lambda x: dist_to(my_pos, x['pos']))
                     if key in ['w','s','d','a']:
-                        if in_range(mapa.calc_pos(my_pos,key), 1, ballooms[0]['pos'], mapa):
+                        if in_range(mapa.calc_pos(my_pos,key), 1, enemies[0]['pos'], mapa):
                             print('Enemie close! Pôr bomba! (Calculado)')
                             key = 'B'
                             ways.append('B')
                     else:
-                        if in_range(my_pos, 1, ballooms[0]['pos'], mapa):
+                        if in_range(my_pos, 1, enemies[0]['pos'], mapa):
                             print('Enemie close! Pôr bomba!')
                             key = 'B'
                             ways.append('B')
