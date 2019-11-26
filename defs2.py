@@ -4,6 +4,10 @@ import math
 import random
 from Node import *
 
+# IMPLEMENTAR
+# para parede pesquisa 1x
+# para inimigos pesquisa todas as iterações
+
 def vector2dir(vx, vy):
     m = max(abs(vx), abs(vy))
     if m == abs(vx):

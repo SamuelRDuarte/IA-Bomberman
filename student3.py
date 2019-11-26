@@ -76,7 +76,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                     got_powerup = True
 
 
-                my_pos = state['bomberman']
+                my_pos = (state['bomberman'])
                 ways = get_possible_ways(mapa, my_pos)
                 print('ways: ', end='')
                 print(ways)
