@@ -545,6 +545,24 @@ def closer_enemies(my_pos,lista):
     return lista1
 
 
+def predict_dir(lista_pos):
+    if lista_pos[-1] == lista_pos[-2]:
+        x1,y1 = lista_pos[-1]
+        x2, y2 = lista_pos[-2]
+        x3, y3= lista_pos[-3]
+        if x1 > x2:
+            return "d"
+        elif x1<x2:
+            return "a"
+        elif y1>y2:
+            return "s"
+        elif y1<y2:
+            return "w"
+        else:
+            return ""
+
+
+
 
 #evita os inimigos
 def avoid(my_pos,en_pos,mapa):
