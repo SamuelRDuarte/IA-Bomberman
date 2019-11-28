@@ -39,6 +39,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
         change=False
         enemyCloseCounter = 0
         goal = []
+        samePosBomba = 0
 
         while True:
             try:
@@ -123,8 +124,12 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                     print('já sabe a hide pos!')
 
                     if detonador:
-                        if history[0] == history[1] and history[0] == history[2]:
+                        if samePosBomba >=3:
                             change = True
+                        if my_pos == previos_pos:
+                            samePosBomba += 1
+                        else:
+                            samePosBomba = 0
 
                     print('change: ' , change)
 
@@ -248,9 +253,9 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                         print('my' + str(my_pos))
 
 
-                        if positions == []:
-                            print("Escolher nova parede: ")
-                            wall = next_wall(my_pos, state['walls'])
+                        '''if positions == [] or positions is None:
+                            print("Escolher nova parede: ")'''
+                        wall = next_wall(my_pos, state['walls'])
                         print('parede: ', wall)
 
                         print('dist to wall: ', end='')
@@ -284,14 +289,9 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                                 print('Perto do inimigo!')
                                 enemyCloseCounter += 1
 
-                            # nunca entra neste if
-                            if in_range(my_pos, 0, enemies[0]['pos'], mapa):
-                                print('Enemie close! Pôr bomba! oneleas')
-                                key = 'B'
-                                ways.append('B')
 
                             # verificar ciclo com inimigo
-                            elif enemyCloseCounter > 20:
+                            if enemyCloseCounter > 20:
                                 print('Ciclo infinito com inimigo encontrado!!!'.center(50, '-'))
                                 # vai destruir parede mais proxima
                                 print('Encontrar caminho até à parede alvo: ' + str(wall))
@@ -347,15 +347,14 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
 
                 if my_pos == previos_pos:
                     samePosCounter += 1
-                    if samePosCounter >= 250:
+                    if samePosCounter >= 20:
                         print('Suicidio'.center(80, '/'))
                         if state['bombs'] != []:
                             if detonador:
                                 key = 'A'
                                 ways.append('A')
                         else:
-                            key = 'B'
-                            ways.append('B')
+                            key = choose_random_move(ways)
                             samePosCounter = 0
                 else:
                     print('Reset samePosCounter!')
