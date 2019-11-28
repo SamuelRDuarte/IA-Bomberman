@@ -167,6 +167,8 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                     else:
                         enemies = [e for e in state['enemies'] if e['name'] in ['Oneal','Minvo','Kondoria','Ovapi','Pass']]
 
+                    enemies = state['enemies']
+
                     # só há inimigos vai atras deles
                     if state['walls'] == [] and state['enemies'] != [] and state['powerups'] == []:
 
@@ -247,11 +249,15 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
 
 
                         if positions == []:
+                            print("Escolher nova parede: ")
                             wall = next_wall(my_pos, state['walls'])
                         print('parede: ', wall)
 
                         print('dist to wall: ', end='')
                         print(dist_to(my_pos, wall))
+
+                        if len(enemies) == 1 and not got_powerup: #para apanhar o powerup
+                            enemies = []
 
 
                         # por bomba se tiver perto da parede
@@ -267,7 +273,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                             goal = wall
 
                         # ha inimigos
-                        elif enemies !=[]:
+                        elif enemies !=[] :
                             enemies.sort(key=lambda x: dist_to(my_pos, x['pos']))
 
                             distToClosestEnemy = dist_to(my_pos, enemies[0]['pos'])
@@ -333,11 +339,11 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                             print('Enemie close! Pôr bomba! (Calculado)')
                             key = 'B'
                             ways.append('B')
-                    else:
-                        if in_range(my_pos, 1, enemies[0]['pos'], mapa):
-                            print('Enemie close! Pôr bomba!')
-                            key = 'B'
-                            ways.append('B')
+                    if in_range(my_pos, 1, enemies[0]['pos'], mapa):
+                        print('Enemie close! Pôr bomba!')
+                        key = 'B'
+                        ways.append('B')
+
 
                 if my_pos == previos_pos:
                     samePosCounter += 1
