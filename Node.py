@@ -18,7 +18,7 @@ class Node:
         return math.pow((self.position[0] - pos.position[0]), 2) + math.pow((self.position[1] - pos.position[1]), 2)
 
 
-def astar(maze, start, end, mapa):
+def astar(maze, start, end, mapa, exat_pos):
     """Returns a list of tuples as a path from the given start to the given end in the given maze"""
 
     # Create start and end node
@@ -50,8 +50,13 @@ def astar(maze, start, end, mapa):
         open_list.pop(current_index)
         closed_list.append(current_node)
 
-        # Found the goal         
-        if current_node.dist_to(end_node)  <= 1:
+        # Found the goal
+        distToGoal = 1
+
+        if exat_pos:
+            distToGoal = 0
+
+        if current_node.dist_to(end_node) <= distToGoal:
             path = []
             current = current_node
             while current is not None:

@@ -35,7 +35,7 @@ def pathToEnemy(mapa, my_pos, enemy_pos):
     # procura caminho para inimigo
     if enemy_pos is not None:
         # procura caminho para o inimigo
-        positions = astar(mapa.map, my_pos, enemy_pos, mapa)
+        positions = astar(mapa.map, my_pos, enemy_pos, mapa, False)
         print('positions to enemie: ' + str(positions))
 
         if positions != [] and positions is not None:
@@ -55,15 +55,15 @@ def pathToEnemy(mapa, my_pos, enemy_pos):
         # nao encontrou caminho
         return ''
 
-# pesquisa caminho para parede
-def findPathToWall(mapa, my_pos, wall):
-    print('Pesquisando caminho para parede...')
-    positions = astar(mapa.map, my_pos, wall, mapa)
-    print('positions wall: ' + str(positions))
+# pesquisa caminho para objetivo
+def findPath(mapa, my_pos, goal, exact_pos):
+    print('Pesquisando caminho para objetivo...')
+    positions = astar(mapa.map, my_pos, goal, mapa, exact_pos)
+    print('positions goal: ' + str(positions))
 
-    # nao encontra caminho para a parede
+    # nao encontra caminho para o objetivo
     if positions == [] or positions == None:
-        print('Caminho nao encontrado para a parede...')
+        print('Caminho nao encontrado para objetivo...')
         return []
 
     # se a proxima posiçao for igual à minha posiçao atual
@@ -81,7 +81,7 @@ def findPathToWall(mapa, my_pos, wall):
     
 
 # retorna a key para uma parede
-def keyPathToWall(my_pos, positions):
+def keyPath(my_pos, positions):
     # nao precisa de pesquisar caminho
     if positions != []:
         print('Não precisa de pesquisar...')
@@ -95,17 +95,17 @@ def keyPathToWall(my_pos, positions):
 
 
 
-def goToWall(mapa, my_pos, ways, positions, wall):
+def goTo(mapa, my_pos, ways, positions, goal, exact_pos):
     # nao sabe o caminho -> pesquisa
     if positions == []:
-        path = findPathToWall(mapa, my_pos, wall)
+        path = findPath(mapa, my_pos, goal, exact_pos)
 
         # nao foi possivel encontrar caminho -> usa outra função
         if path == []:
-            key = choose_move(my_pos, ways, wall)
-            return key, [], wall
+            key = choose_move(my_pos, ways, goal)
+            return key, [], goal
         
         positions = path
 
     # ja tem caminho
-    return keyPathToWall(my_pos, positions)
+    return keyPath(my_pos, positions)
