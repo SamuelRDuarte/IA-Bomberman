@@ -78,7 +78,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                         enemyCloseCounter = 0
 
                 # ignora powerups não utilizados
-                if level == 2 or level == 5 or level == 6 or level == 11 or level == 12 or level == 13 or level == 14:
+                if level == 2 or level == 5 or level == 6 or level == 11 or level == 12 or level == 13 or level == 14 or level==15:
                     got_powerup = True
 
 
@@ -299,10 +299,11 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                             if enemyCloseCounter > 20:
                                 print('Ciclo infinito com inimigo encontrado!!!'.center(50, '-'))
                                 # vai destruir parede mais proxima
+                                key, positions, goal = goTo(mapa, my_pos, ways, positions, wall, False)
                                 print('Encontrar caminho até à parede alvo: ' + str(wall))
-                                key, positions = choose_key(mapa, ways, my_pos, positions, wall, False)
-                                goal = wall
                                 enemyCloseCounter = 0
+                                print('positions: ' + str(positions))
+                                print('key from ciclo enimie: ' + key)
                                 print('goal: ',goal)
 
                             # procura caminho para inimigo e parede
@@ -323,17 +324,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                             print('positions: ' + str(positions))
                             print('key from gotoWall: ' + key)
                             print('goal' + str(goal))
-                            
 
-                    '''if len(history)>=2:
-                        if my_pos == history[-1]:
-                            if limite == 3:
-                                key=choose_random_move(ways)
-                                print ("\n\n\nTINHA BUGADO\n\n\n")
-                                limite = 0;
-                            limite +=1
-                        else:
-                            limite = 0'''
 
                 if state['enemies'] != [] and state['bombs'] == []:
                     ##17/10 - Fugir dos inimigos
@@ -360,6 +351,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                                 ways.append('A')
                         else:
                             key = choose_random_move(ways)
+                            print ('key random:'+ key)
                             samePosCounter = 0
                 else:
                     print('Reset samePosCounter!')
