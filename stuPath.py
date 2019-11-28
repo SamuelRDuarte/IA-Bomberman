@@ -225,9 +225,12 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                         print("going to powerups")
                         #key = choose_move(my_pos,ways,state['powerups'][0][0])
                         #key,positions = choose_key(mapa, ways, my_pos, positions, state['powerups'][0][0], True)
-                        key = goto(my_pos,state['powerups'][0][0])
-                        goal = state['powerups'][0][0]
                         powerup = state['powerups'][0][0]
+
+                        key, positions, goal = goTo(mapa, my_pos, ways, positions, powerup, True)
+                        print('positions: ' + str(positions))
+                        print('key from goTo (powerup): ' + key)
+                        print('goal' + str(goal))
                         if state['walls']:
                             parede = min(state['walls'], key=lambda x: dist_to(my_pos, x))
                             if dist_to(my_pos, parede) <= 1:
@@ -238,9 +241,12 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                     # ir para 'exit'
                     elif got_powerup and state['enemies'] == [] and state['exit'] != []:
                         print("going to exit")
-                        #key,positions = choose_key(mapa, ways, my_pos, positions, state['exit'], True)
-                        goal = state['exit']
-                        key = choose_move(my_pos,ways,state['exit'])
+
+                        key, positions, goal = goTo(mapa, my_pos, ways, positions, state['exit'], True)
+                        print('positions: ' + str(positions))
+                        print('key from goTo (exit): ' + key)
+                        print('goal' + str(goal))
+
                         if state['walls']:
                             parede = min(state['walls'], key=lambda x: dist_to(my_pos, x))
                             if dist_to(my_pos, parede) <= 1:
@@ -274,8 +280,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                         # para apanhar o detonator
                         elif state['level'] == 3 and len(enemies) == 1 and not detonador:
                             print('Encontrar caminho até à parede alvo, só 1 enemie: ' + str(wall))
-                            key, positions = choose_key(mapa, ways, my_pos, positions, wall, False)
-                            goal = wall
+                            key, positions, goal = goTo(mapa, ways, my_pos, positions, wall, True)
 
                         # ha inimigos
                         elif enemies !=[] :
@@ -306,7 +311,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                                 key = pathToEnemy(mapa, my_pos, enemies[0]['pos'])
 
                                 if key == '':
-                                    key, positions, goal = goToWall(mapa, my_pos, ways, positions, wall)
+                                    key, positions, goal = goTo(mapa, my_pos, ways, positions, wall,False)
                                     print('positions: ' + str(positions))
                                     print('key from gotoWall: ' + key)
                                     print('goal' + str(goal))
@@ -314,7 +319,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
 
                         else:
                             print('Encontrar caminho até à parede alvo: ' + str(wall))
-                            key, positions, goal = goToWall(mapa, my_pos, ways, positions, wall)
+                            key, positions, goal = goTo(mapa, my_pos, ways, positions, wall,False)
                             print('positions: ' + str(positions))
                             print('key from gotoWall: ' + key)
                             print('goal' + str(goal))

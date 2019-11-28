@@ -148,7 +148,7 @@ def choose_key(mapa, ways, my_pos, positions, goal, last_pos_wanted):
         return key, positions
 
     else: # pesquisar caminho
-        positions = astar(mapa.map, my_pos, goal, mapa)
+        positions = astar(mapa.map, my_pos, goal, mapa,False)
         print('positions: ' + str(positions))
 
         if positions == [] or positions == None:
