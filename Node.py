@@ -115,7 +115,7 @@ def astar(maze, start, end, mapa, exat_pos):
             open_list.append(child)
             #print('Adicionar à lista de nos abertos')
             count_open_nodes += 1
-            if count_open_nodes > 500:
+            if count_open_nodes > 300:
                 return []
 
 

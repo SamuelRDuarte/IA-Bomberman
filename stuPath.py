@@ -78,8 +78,12 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                         enemyCloseCounter = 0
 
                 # ignora powerups não utilizados
-                if level == 2 or level == 5 or level == 6 or level == 11 or level == 12 or level == 13 or level == 14 or level==15:
+                if level == 2 or level == 5 or level == 6 or level == 10 or level == 11 or level == 12 or level == 13 or level == 14 or level==15:
                     got_powerup = True
+
+                if detonador:
+                    if level == 8 or level == 13:
+                        got_powerup = True
 
 
                 my_pos = state['bomberman']
@@ -90,12 +94,10 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                 # verificar se tem detonador
                 if my_pos == powerup:
                     got_powerup = True
-                    if level == 3:
+                    if level == 3 or level == 8 or level == 13:
                         detonador = True
                     if level == 9:
                         bombpass = True
-                    if level == 10:
-                        wallpass = True
 
                     
                 '''
@@ -243,6 +245,8 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                         print("going to exit")
 
                         key, positions, goal = goTo(mapa, my_pos, ways, positions, state['exit'], True)
+                        if key == '':
+                            key, positions, goal = goTo(mapa, my_pos, ways, positions, state['exit'], True)
                         print('positions: ' + str(positions))
                         print('key from goTo (exit): ' + key)
                         print('goal' + str(goal))
@@ -277,10 +281,6 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                             key = 'B'
                             ways.append('B')
 
-                        # para apanhar o detonator
-                        elif state['level'] == 3 and len(enemies) == 1 and not detonador:
-                            print('Encontrar caminho até à parede alvo, só 1 enemie: ' + str(wall))
-                            key, positions, goal = goTo(mapa, ways, my_pos, positions, wall, True)
 
                         # ha inimigos
                         elif enemies !=[] :
@@ -376,7 +376,6 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                 print("got_powerup: ",got_powerup)
                 print('Detonador: ', detonador)
                 print('Bombpass: ', bombpass)
-                print('Wallpass: ', wallpass)
 
                 await websocket.send(
                     json.dumps({"cmd": "key", "key": key})
