@@ -41,6 +41,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
         enemyCloseCounter = 0
         goal = []
         samePosBomba = 0
+        corner = None
 
         while True:
             try:
@@ -50,6 +51,9 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                 # Next lines are only for the Human Agent, the key values are nonetheless the correct ones!
 
                 if state['level'] == 15 and state['enemies'] == []:
+                    return 0
+
+                if state['lives'] == 0:
                     return 0
 
                 key = ""
@@ -78,6 +82,10 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                         goal = []
                         enemyCloseCounter = 0
 
+                
+                if corner == None:
+                    corner = find_corner(mapa)
+
                 # ignora powerups não utilizados
                 if level == 2 or level == 5 or level == 6 or level == 10 or level == 11 or level == 12 or level == 13 or level == 14 or level==15:
                     got_powerup = True
@@ -100,16 +108,6 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                     if level == 9:
                         bombpass = True
 
-                    
-                '''
-                #verificar se tem bombpass
-                if my_pos == powerup:
-                    got_powerup = True
-                    
-
-                # verificar se tem wallpass
-                if my_pos == powerup:
-                    got_powerup = True'''
                     
                 # fuga recursiva
                 if state['bombs'] != [] and not calc_hide_pos:
@@ -180,7 +178,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                     # só há inimigos vai atras deles
                     if state['walls'] == [] and state['enemies'] != [] and state['powerups'] == []:
 
-                        enemies = state['enemies']
+                        enemies = [e for e in state['enemies'] if e['name'] in ['Oneal','Minvo','Kondoria','Ovapi','Pass']]
                         
                         if enemies !=[]:
                             enemies.sort(key=lambda x: dist_to(my_pos, x['pos']))
@@ -206,22 +204,19 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                                 print('goal: ',goal)
 
                             
-                        '''
-                        elif dist_to(my_pos, (1, 1)) == 0:
+                        elif dist_to(my_pos, corner) == 0:
                             print("going to kill enemies")
                             enemies = state['enemies']
                             enemies.sort(key=lambda x: dist_to(my_pos, x['pos']))
-                            if dist_to([1,1],enemies[0]['pos']) < 6:
+                            if dist_to(list(corner), enemies[0]['pos']) < 6:
                                 key = 'B'
                                 ways.append('B')
                             else:
                                 pass
                         else:
-                            # key = goto(my_pos,(1,1))
-                            # key = choose_move(my_pos, ways, [1, 1])
-                            key, positions = choose_key(mapa, ways, my_pos, positions, list(mapa.bomberman_spawn), True)
-                            goal = list(mapa.bomberman_spawn)
-                        '''
+                            key, positions = choose_key(mapa, ways, my_pos, positions, list(corner), True)
+                            goal = list(corner)
+                        
 
                     # apanhar powerups
                     elif state['powerups'] != []:
@@ -377,6 +372,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                 print("got_powerup: ",got_powerup)
                 print('Detonador: ', detonador)
                 print('Bombpass: ', bombpass)
+                print('corner: ', str(corner))
 
                 await websocket.send(
                     json.dumps({"cmd": "key", "key": key})

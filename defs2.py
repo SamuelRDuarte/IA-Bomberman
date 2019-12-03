@@ -2,6 +2,13 @@ from mapa import Map
 import math
 import random
 
+
+def find_corner(mapa):
+    for x in range(mapa.hor_tiles):
+        for y in range(mapa.ver_tiles):
+            if not mapa.is_blocked((x, y)):
+                return (x, y)
+
 # para qualquer posicao retorna um lista de possoveis movimentos
 def get_possible_ways2(mapa, position):  
     ways = []
