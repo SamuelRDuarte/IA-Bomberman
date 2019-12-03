@@ -141,12 +141,6 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
 
                     print('change: ' , change)
 
-                    '''
-                    if len(history) > 11:
-                        for i in range(0,10):
-                            if history[i] != history[i+1]:
-                                change= False
-                    '''
 
                     if not change:
                         if dist_to(my_pos, goal) != 0:
@@ -219,8 +213,6 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                             if dist_to(list(corner), enemies[0]['pos']) < 6:
                                 key = 'B'
                                 ways.append('B')
-                            else:
-                                pass
                         else:
                             key, positions = choose_key(mapa, ways, my_pos, positions, list(corner), True)
                             goal = list(corner)
@@ -317,7 +309,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                             # procura caminho para inimigo e parede
                             else:
 
-                                if positions !=[]:
+                                if positions !=[] or (level == 1 and state['step'] >= 500):
                                     key, positions, goal = goTo(mapa, my_pos, ways, positions, wall, False)
                                 else:
                                     # procura caminho para inimigo
