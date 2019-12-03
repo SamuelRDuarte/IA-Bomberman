@@ -115,7 +115,8 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                 if state['bombs'] != [] and not calc_hide_pos:
                     tentativasRun += 1
                     if tentativasRun > 3:
-                        goal,calc_hide_pos = choose_hide_pos(state['bombs'][0][0],state['bombs'][0], mapa, '', 0, 60, state['enemies'],detonador)
+                        print("pos da bomba(stuck):", state['bombs'][0][0])
+                        goal,calc_hide_pos = choose_hide_pos2(state['bombs'][0][0],state['bombs'][0], mapa, '', 0, 60, state['enemies'],detonador)
                     else:
                         print("calcurar hide pos")
                         goal, calc_hide_pos = choose_hide_pos2(my_pos, state['bombs'][0], mapa, '', 0, 60, state['enemies'],detonador)
@@ -155,9 +156,11 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                                 print('Usar detonador')
                                 key = 'A'
                                 ways.append('A')
+                                positions = []
                             else:
                                 print("Esperar que a bomba rebente...")
                                 key = ''
+                                positions = []
 
                     else:
                         print("A ir para o [1,1]! ZWA")
@@ -239,10 +242,10 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                     # ir para 'exit'
                     elif got_powerup and state['enemies'] == [] and state['exit'] != []:
                         print("going to exit")
-                        goal = state['exit']
-                        key, positions = choose_key(mapa, ways, my_pos, positions, state['exit'], True)
-                        if key == '':
-                            key, positions, goal = goTo(mapa, my_pos, ways, positions, state['exit'], True)
+                        #goal = state['exit']
+                        key, positions,goal = goTo(mapa, my_pos, ways, positions, state['exit'], True)
+                        #if key == '':
+                        #    key, positions, goal = goTo(mapa, my_pos, ways, positions, state['exit'], True)
                         print('positions: ' + str(positions))
                         print('key from goTo (exit): ' + key)
                         print('goal' + str(goal))
@@ -295,11 +298,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                             if enemyCloseCounter > 20:
                                 print('Ciclo infinito com inimigo encontrado!!!'.center(50, '-'))
                                 # vai destruir parede mais proxima
-                                #key, positions, goal = goTo(mapa, my_pos, ways, positions, wall, False)
-                                goal = wall
-                                key, positionsCiclo = choose_key(mapa,ways,my_pos,positionsCiclo,wall,False)
-                                if key == '':
-                                    key, positions, goal = goTo(mapa, my_pos, ways, positions, wall, False)
+                                key, positions, goal = goTo(mapa, my_pos, ways, positions, wall, False)
                                 print('Encontrar caminho até à parede alvo: ' + str(wall))
                                 enemyCloseCounter = 0
                                 print('positions: ' + str(positions))

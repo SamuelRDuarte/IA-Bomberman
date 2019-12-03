@@ -43,31 +43,31 @@ def choose_hide_pos(bomberman_pos, bomb, mapa, previous_key, n, limit,enemies,de
             return choose_hide_pos([x,y+1], bomb, mapa, 's', n+1, limit,enemies,detonador)
 
     if previous_key in ['w', 's']: # andou na vertical, experimenta para os lados
+        print("andou na vertical  ckecking esquerda")
+        if 'a' in ways and not in_range(mapa.calc_pos(bomberman_pos, 'a'), 1, ord_enemies[0][1], mapa):
+            print("andou na vertical resultou esquerda")
+            return choose_hide_pos([x - 1, y], bomb, mapa, 'a', n + 1, limit, enemies, detonador)
         print("andou na vertical  ckecking direita")
         if 'd' in ways and not in_range(mapa.calc_pos(bomberman_pos,'d'),1, ord_enemies[0][1], mapa):
             print("andou na vertical  resultou direita")
             return choose_hide_pos([x + 1, y], bomb, mapa, 'd', n+1, limit,enemies,detonador)
-        print("andou na vertical  ckecking esquerda")
-        if 'a' in ways and not in_range(mapa.calc_pos(bomberman_pos,'a'),1, ord_enemies[0][1], mapa):
-            print("andou na vertical resultou esquerda")
-            return choose_hide_pos([x - 1, y], bomb, mapa, 'a', n + 1, limit,enemies,detonador)
-            
+
+    print("checking cima")
+    if 'w' in ways and not in_range(mapa.calc_pos(bomberman_pos, 'w'), 1, ord_enemies[0][1], mapa):
+        print("resultou cima")
+        return choose_hide_pos([x, y - 1], bomb, mapa, 'w', n + 1, limit, enemies, detonador)
+    print("checking baixo")
+    if 's' in ways and not in_range(mapa.calc_pos(bomberman_pos, 's'), 1, ord_enemies[0][1], mapa):
+        print("resultou baixo")
+        return choose_hide_pos([x, y + 1], bomb, mapa, 's', n + 1, limit, enemies, detonador)
+    print("checking esquerda")
+    if 'a' in ways and not in_range(mapa.calc_pos(bomberman_pos, 'a'), 1, ord_enemies[0][1], mapa):
+        print("resultou esquerda")
+        return choose_hide_pos([x - 1, y], bomb, mapa, 'a', n + 1, limit, enemies, detonador)
     print("checking direita")
     if 'd' in ways and not in_range(mapa.calc_pos(bomberman_pos,'d'),1, ord_enemies[0][1], mapa):
         print("resultou direita")
         return choose_hide_pos([x + 1, y], bomb, mapa, 'd', n+1, limit,enemies,detonador)
-    print("checking cima")
-    if 'w' in ways and not in_range(mapa.calc_pos(bomberman_pos,'w'),1, ord_enemies[0][1], mapa):
-        print("resultou cima")
-        return choose_hide_pos([x, y - 1], bomb, mapa, 'w', n + 1, limit,enemies,detonador)
-    print("checking esquerda")
-    if 'a' in ways and not in_range(mapa.calc_pos(bomberman_pos,'a'),1, ord_enemies[0][1], mapa):
-        print("resultou esquerda")
-        return choose_hide_pos([x - 1, y], bomb, mapa, 'a', n + 1, limit,enemies,detonador)
-    print("checking baixo")
-    if 's' in ways and not in_range(mapa.calc_pos(bomberman_pos,'s'),1, ord_enemies[0][1], mapa):
-        print("resultou baixo")
-        return choose_hide_pos([x, y + 1], bomb, mapa, 's', n+1, limit,enemies,detonador)
     else:
         return bomberman_pos,False
 
@@ -111,14 +111,15 @@ def choose_hide_pos2(bomberman_pos, bomb, mapa, previous_key, n, limit,enemies,d
             return choose_hide_pos2([x, y - 1], bomb, mapa, 'w', n+1, limit,enemies,detonador)
 
     if previous_key in ['w', 's']: # andou na vertical, experimenta para os lados
+        print("andou na vertical  ckecking direita")
+        if 'd' in ways and not in_range(mapa.calc_pos(bomberman_pos, 'd'), 1, ord_enemies[0][1], mapa):
+            print("andou na vertical  resultou direita")
+            return choose_hide_pos2([x + 1, y], bomb, mapa, 'd', n + 1, limit, enemies, detonador)
         print("andou na vertical  ckecking esquerda")
         if 'a' in ways and not in_range(mapa.calc_pos(bomberman_pos,'a'),1, ord_enemies[0][1], mapa):
             print("andou na vertical resultou esquerda")
             return choose_hide_pos2([x-1,y], bomb, mapa, 'a', n+1, limit,enemies,detonador)
-        print("andou na vertical  ckecking direita")
-        if 'd' in ways and not in_range(mapa.calc_pos(bomberman_pos,'d'),1, ord_enemies[0][1], mapa):
-            print("andou na vertical  resultou direita")
-            return choose_hide_pos2([x + 1, y], bomb, mapa, 'd', n+1, limit, enemies,detonador)
+
 
     print("checking baixo")
     if 's' in ways and not in_range(mapa.calc_pos(bomberman_pos,'s'),1, ord_enemies[0][1], mapa):
@@ -128,14 +129,14 @@ def choose_hide_pos2(bomberman_pos, bomb, mapa, previous_key, n, limit,enemies,d
     if 'w' in ways and not in_range(mapa.calc_pos(bomberman_pos,'w'),1, ord_enemies[0][1], mapa):
         print("resultou cima")
         return choose_hide_pos2([x, y - 1], bomb, mapa, 'w', n+1, limit,enemies,detonador)
+    print("checking direita")
+    if 'd' in ways and not in_range(mapa.calc_pos(bomberman_pos, 'd'), 1, ord_enemies[0][1], mapa):
+        print("resultou direita")
+        return choose_hide_pos2([x + 1, y], bomb, mapa, 'd', n + 1, limit, enemies, detonador)
     print("checking esquerda")
     if 'a' in ways and not in_range(mapa.calc_pos(bomberman_pos,'a'),1, ord_enemies[0][1], mapa):
         print("resultou esquerda")
         return choose_hide_pos2([x-1,y], bomb, mapa, 'a', n+1, limit,enemies,detonador)
-    print("checking direita")
-    if 'd' in ways and not in_range(mapa.calc_pos(bomberman_pos,'d'),1, ord_enemies[0][1], mapa):
-        print("resultou direita")
-        return choose_hide_pos2([x + 1, y], bomb, mapa, 'd', n+1, limit,enemies,detonador)
     else:
         return choose_hide_pos(bomb[0],bomb,mapa,previous_key,n+1,limit,enemies,detonador)
 
