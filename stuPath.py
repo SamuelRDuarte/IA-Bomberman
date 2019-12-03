@@ -29,6 +29,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
         previos_pos = None
         samePosCounter = 0
         positions = []
+        positionsCiclo = []
         history = []
         limite = 0
         got_powerup = False
@@ -40,6 +41,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
         enemyCloseCounter = 0
         goal = []
         samePosBomba = 0
+        tentativasRun = 0
 
         while True:
             try:
@@ -112,8 +114,12 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                     
                 # fuga recursiva
                 if state['bombs'] != [] and not calc_hide_pos:
-                    print("calcurar hide pos")
-                    goal, calc_hide_pos = choose_hide_pos2(my_pos, state['bombs'][0], mapa, '', 0, 60, state['enemies'],detonador)
+                    tentativasRun += 1
+                    if tentativasRun > 3:
+                        goal,calc_hide_pos = choose_hide_pos(state['bombs'][0][0],state['bombs'][0], mapa, '', 0, 60, state['enemies'],detonador)
+                    else:
+                        print("calcurar hide pos")
+                        goal, calc_hide_pos = choose_hide_pos2(my_pos, state['bombs'][0], mapa, '', 0, 60, state['enemies'],detonador)
                     print('my pos:', my_pos)
                     print('hide pos calculado:',goal)
                     print('hide pos: ' + str(calc_hide_pos))
@@ -123,6 +129,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                     change = False
 
                 elif state['bombs'] != [] and calc_hide_pos:
+                    tentativasRun = 0
                     print('já sabe a hide pos!')
 
                     if detonador:
@@ -194,6 +201,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                             if distToClosestEnemy < 2.5:
                                 print('Perto do inimigo!')
                                 enemyCloseCounter += 1
+                                print('enemyCloseCounter: ',enemyCloseCounter)
 
                             elif enemyCloseCounter > 20:
                                 print('Ciclo infinito encontrado!!!'.center(50, '-'))
@@ -243,8 +251,8 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                     # ir para 'exit'
                     elif got_powerup and state['enemies'] == [] and state['exit'] != []:
                         print("going to exit")
-
-                        key, positions, goal = goTo(mapa, my_pos, ways, positions, state['exit'], True)
+                        goal = state['exit']
+                        key, positions = choose_key(mapa, ways, my_pos, positions, state['exit'], True)
                         if key == '':
                             key, positions, goal = goTo(mapa, my_pos, ways, positions, state['exit'], True)
                         print('positions: ' + str(positions))
@@ -299,7 +307,11 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                             if enemyCloseCounter > 20:
                                 print('Ciclo infinito com inimigo encontrado!!!'.center(50, '-'))
                                 # vai destruir parede mais proxima
-                                key, positions, goal = goTo(mapa, my_pos, ways, positions, wall, False)
+                                #key, positions, goal = goTo(mapa, my_pos, ways, positions, wall, False)
+                                goal = wall
+                                key, positionsCiclo = choose_key(mapa,ways,my_pos,positionsCiclo,wall,False)
+                                if key == '':
+                                    key, positions, goal = goTo(mapa, my_pos, ways, positions, wall, False)
                                 print('Encontrar caminho até à parede alvo: ' + str(wall))
                                 enemyCloseCounter = 0
                                 print('positions: ' + str(positions))
@@ -308,14 +320,18 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
 
                             # procura caminho para inimigo e parede
                             else:
-                                # procura caminho para inimigo
-                                key = pathToEnemy(mapa, my_pos, enemies[0]['pos'])
 
-                                if key == '':
-                                    key, positions, goal = goTo(mapa, my_pos, ways, positions, wall,False)
-                                    print('positions: ' + str(positions))
-                                    print('key from gotoWall: ' + key)
-                                    print('goal' + str(goal))
+                                if positions !=[]: #fazer o mesmo para as paredes pois pode entrar em loop entre parede e enemie(numa pos encontra path to enemie e noutra nao)
+                                    key, positions, goal = goTo(mapa, my_pos, ways, positions, wall, False)
+                                else:
+                                    # procura caminho para inimigo
+                                    key = pathToEnemy(mapa, my_pos, enemies[0]['pos'])
+
+                                    if key == '':
+                                        key, positions, goal = goTo(mapa, my_pos, ways, positions, wall, False)
+                                        print('positions: ' + str(positions))
+                                        print('key from gotoWall: ' + key)
+                                        print('goal' + str(goal))
 
 
                         else:
@@ -376,6 +392,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                 print("got_powerup: ",got_powerup)
                 print('Detonador: ', detonador)
                 print('Bombpass: ', bombpass)
+                print('enemyCloseCounter: ', enemyCloseCounter)
 
                 await websocket.send(
                     json.dumps({"cmd": "key", "key": key})
