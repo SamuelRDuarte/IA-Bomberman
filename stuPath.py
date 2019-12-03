@@ -9,6 +9,7 @@ from defs2 import *
 from mapa import Map
 from Node import *
 from path import *
+from bomb import *
 
 
 async def agent_loop(server_address="localhost:8000", agent_name="student"):

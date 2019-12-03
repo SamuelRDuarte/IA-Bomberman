@@ -1,103 +1,6 @@
 from mapa import Map
-import math
-import random
-
-# para qualquer posicao retorna um lista de possoveis movimentos
-def get_possible_ways2(mapa, position):  
-    ways = []
-
-    x, y = position
-    #print(mapa.map)
-    print(position)
-    print('direita: ' + str(mapa.map[x + 1][y]) + ' baixo: ' + str(mapa.map[x][y + 1]) + ' esquerda: ' + str(
-        mapa.map[x - 1][y]) + ' cima: ' + str(mapa.map[x][y - 1]))
-
-    print((x, y+1) in mapa._walls)
-    print([x, y+1] in mapa._walls)
-    
-    if not mapa.is_blocked([x+1, y]):
-        
-        ways.append('d')
-    if not mapa.is_blocked([x, y+1]):
-        
-        ways.append('s')
-    if not mapa.is_blocked([x-1, y]):
-        ways.append('a')
-        
-    if not mapa.is_blocked([x, y-1]):
-        
-        ways.append('w')
-
-    return ways
-
-
-def get_possible_ways(mapa, position):  
-    ways = []
-
-    x, y = position
-    print('direita:'+str(mapa.map[x+1][y])+'baixo:'+str(mapa.map[x][y+1])+'esquerda:'+str(mapa.map[x-1][y])+'cima:'+str(mapa.map[x][y-1]))
-    
-    tile1 = mapa.map[x+1][y]
-    tile2 = mapa.map[x-1][y]
-    tile3 = mapa.get_tile((x,y+1))
-    tile4 = mapa.get_tile((x,y-1))
-
-    if tile1 != 1 and not (x+1,y) in mapa.walls:
-        ways.append('d')
-    if tile3 != 1 and not (x,y+1) in mapa.walls:
-        ways.append('s')
-    if tile2 != 1 and not (x-1,y) in mapa.walls:
-        ways.append('a')
-    if tile4 != 1 and not (x,y-1) in mapa.walls:
-        ways.append('w')
-
-    return ways
-
-
-# retorna distancia entre duas posiçoes
-def dist_to(pos1, pos2):
-    if len(pos1) != 2 or len(pos1) != 2:
-        return ''
-
-<<<<<<< HEAD
-def goToPosition(my_pos, next_pos):
-    print('goToPosition'.center(50, '-'))
-    print('my_pos: ' + str(my_pos))
-    print('next_pos: ' + str(next_pos))
-
-    mx,my = my_pos
-    nx,ny = next_pos
-
-    res = [nx-mx, ny-my]
-    print('res: ' + str(res))
-    return getKey(res)
-
-def choose_key(mapa, ways, my_pos, positions, goal, last_pos_wanted):
-    # já sabe o caminho
-    if positions != []:
-        while my_pos == positions[0]:
-            print('my_pos == next_pos')
-            positions.pop(0)
-
-        key = goToPosition(my_pos, positions[0])
-        positions.pop(0)
-        return key, positions
-
-    else: # pesquisar caminho
-        positions = astar(mapa.map, my_pos, goal, mapa,last_pos_wanted)
-        print('positions: ' + str(positions))
-
-        if positions == [] or positions == None:
-            print('Caminho nao encontrado...')
-            return choose_move(my_pos,ways,goal),[]
-            #return ''
-
-        if len(positions) > 1:
-            positions.pop(0)
-
-
-        return goToPosition(my_pos, positions[0]),positions
-
+from path import choose_move, choose_random_move, dist_to, goToPosition
+from Node import astar
 
 def choose_key2(mapa, ways, my_pos, positions, wall, oneal, last_pos_wanted):
     # já sabe o caminho
@@ -221,70 +124,139 @@ def choose_key3(mapa, ways, my_pos, positions, wall, oneal, last_pos_wanted):
             return choose_move(my_pos, ways, wall), positions, wall
 
         return goToPosition(my_pos, positions[0]), positions, wall
-=======
-    x1, y1 = pos1
-    x2, y2 = pos2
->>>>>>> 70a4e9999c3a70c24959a7705a21855a7aa55d0d
-
-    return math.sqrt(math.pow((x2-x1), 2) + math.pow((y2-y1), 2))
-               
-
-# verifica se duas posicoes estao na msm direcao 
-def check_same_direction(pos1, pos2):
-    if len(pos1) != 2 or len(pos2) != 2:
-        return False
-
-    x1, y1 = pos1
-    x2, y2 = pos2
-
-    if x1 == x2 or y1 == y2:
-        return True
-
-    return False
 
 
-# calcula e retorna a parede mais proxima (mt ineficiente)
-def next_wall(bomberman_pos, walls):
-    if walls == []:
-        return 
+# dando uma key retorna a sua inversa
+def inverse(key):
+    if key == 'a':
+        return 'd'
+    elif key == 'd':
+        return 'a'
+    elif key == 's':
+        return 'w'
+    elif key == 'w':
+        return 's'
 
-    nwall = walls[0]
-    min_cost = dist_to(bomberman_pos, walls[0])
-    for wall in walls:
-        cost = dist_to(bomberman_pos, wall)
-        if cost < min_cost:
-            min_cost = cost
-            nwall = wall
 
-    return nwall
 
-def in_range(bomberman_pos,raio,obstaculo,mapa):
-    cx,cy = bomberman_pos
-    if obstaculo == None:
-        return False
-    bx,by = obstaculo
+
+#evita os inimigos
+def avoid(my_pos,en_pos,mapa):
+
+    # if en_pos[0] == my_pos[0]:
+    #     if not Map.is_blocked(mapa, [my_pos[0], my_pos[1] - 1]):  # Bomberman para baixo
+    #         print("BAIXO")
+    #         return 's'
+    #     else:
+    #         print("CIMA")
+    #         return 'w'
+    #
+    # elif en_pos[1]==mu
+
+
+    if en_pos[0]>my_pos[0]:                                             #Inimigo à direita
+        if not Map.is_blocked(mapa,[my_pos[0]-1,my_pos[1]]):                       #BOmberman vai à esquerda
+            print("ESQUERDA")
+            return 'a'
+        else:                                                           #Pedra à esquerda
+            if en_pos[1]>my_pos[1]:                                     #Inimigo abaixo
+                if not Map.is_blocked(mapa,[my_pos[0], my_pos[1]-1]):              #Bomberman para cima
+                    print("CIMA")
+                    return 'w'
+            elif en_pos[1] < my_pos[1]:  # Inimigo acima
+                if not Map.is_blocked(mapa, [my_pos[0], my_pos[1] + 1]):  # Bomberman para baixo
+                    print("BAIXO")
+                    return 's'
+                else:
+                    print("rip")
+
+            else:                                                       # INIMIGO NO MESMO NIVEL
+                if not Map.is_blocked(mapa, [my_pos[0], my_pos[1] - 1]):  # Bomberman para cima
+                    print("CIMA")
+                    return 'w'
+                else:
+                    print("BAIXO")
+                    return 's'
+
+
+    elif en_pos[0]<my_pos[0]:                                                               #Inimigo à esquerda
+        if not Map.is_blocked(mapa,[my_pos[0] + 1, my_pos[1]]):  # BOmberman vai à direita
+            print("DIREITA")
+            return 'd'
+        else:                                                   # Pedra à direita
+            if en_pos[1] > my_pos[1]:  # Inimigo abaixo
+                if not Map.is_blocked(mapa,[my_pos[0], my_pos[1] - 1]):  # Bomberman para cima
+                    print("CIMA")
+                    return 'w'
+                else:
+                    print("rip")
+                    return ''
+
+            elif en_pos[1] < my_pos[1]:
+                if not Map.is_blocked(mapa,[my_pos[0], my_pos[1] + 1]):  # Bomberman para baixo
+                    print("BAIXO")
+                    return 's'
+                else:
+                    print("rip")
+                    return ''
+
+
+            else:  # Inimigo NO MESMO NIVEL
+                if not Map.is_blocked(mapa,[my_pos[0], my_pos[1] - 1]):  # Bomberman para cima
+                    print("CIMA")
+                    return 'w'
+                else:
+                    print("BAIXO")
+                    return 's'
+
+
+    else:                                                               #INIMIGO EM LINHA
+        if en_pos[1] > my_pos[1]:  # Inimigo acima
+            if not Map.is_blocked(mapa, [my_pos[0], my_pos[1] - 1]):  # Bomberman para cima
+                print("CIMA")
+                return 'w'
+            else:
+                print("rip")
+                return ''
+
+        elif en_pos[1] < my_pos[1]:
+            if not Map.is_blocked(mapa, [my_pos[0], my_pos[1] +  1]):  # Bomberman para baixo
+                print("BAIXO")
+                return 's'
+            else:
+                print("rip")
+                return ''
+
+
+        else:  # Inimigo NO MESMO NIVEL
+            if not Map.is_blocked(mapa, [my_pos[0], my_pos[1] - 1]):  # Bomberman para cima
+                print("CIMA")
+                return 'w'
+            else:
+                print("BAIXO")
+                return 's'
+
+
+def vector2dir(vx, vy):
+    m = max(abs(vx), abs(vy))
+    if m == abs(vx):
+        if vx < 0:
+            d = 'a'  # 'a'
+        else:
+            d = 'd'  # 'd'
+    else:
+        if vy > 0:
+            d = 's'  # s
+        else:
+            d = 'w'  # w
+    return d
     
-    if by == cy:
-        for r in range(raio + 1):
-            if mapa.is_stone((bx + r, by)):
-                break  # protected by stone to the right
-            if (cx, cy) == (bx + r, by):
-                return True
-        for r in range(raio + 1):
-            if mapa.is_stone((bx - r, by)):
-                break  # protected by stone to the left 
-            if (cx, cy) == (bx - r, by):
-                return True
-    if bx == cx:
-        for r in range(raio + 1):
-            if mapa.is_stone((bx, by + r)):
-                break  # protected by stone in the bottom
-            if (cx, cy) == (bx, by + r):
-                return True
-        for r in range(raio + 1):
-            if mapa.is_stone((bx, by - r)):
-                break  # protected by stone in the top
-            if (cx, cy) == (bx, by - r):
-                return True
-    return False
 
+def goto(origem, destino):
+    if len(origem) != 2 or len(destino) != 2:
+        return ''
+
+    ox, oy = origem
+    dx, dy = destino
+
+    return vector2dir(dx - ox, dy - oy)

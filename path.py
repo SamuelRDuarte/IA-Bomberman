@@ -1,6 +1,7 @@
 from Node import *
 from mapa import Map
-from defs2 import dist_to, choose_move
+import random
+from defs2 import dist_to
 
 def getKey(pos):
     if len(pos) != 2:
@@ -28,6 +29,60 @@ def goToPosition(my_pos, next_pos):
     res = [nx-mx, ny-my]
     print('res: ' + str(res))
     return getKey(res)
+
+
+# da lista de possiveis caminhos escolhe o primeiro caminho
+def choose_random_move(ways):
+    if len(ways) != []:
+        return random.choice(ways)
+
+
+def choose_move(my_pos, ways, goal):
+    if len(ways) == 0:
+        return ''
+
+    mx, my = my_pos
+    
+    custo_min = []
+
+    if 'a' in ways:
+        custo_min.append(('a', dist_to([mx-1, my], goal)))        
+    if 's' in ways:
+        custo_min.append(('s', dist_to([mx, my+1], goal)))
+    if 'd' in ways:
+        custo_min.append(('d', dist_to([mx+1, my], goal)))
+    if 'w' in ways:
+        custo_min.append(('w', dist_to([mx, my-1], goal)))
+
+    custo_min.sort(key= lambda x: x[1]) # ordenar por custo (distancia)
+
+    return custo_min[0][0]
+
+
+def choose_key(mapa, ways, my_pos, positions, goal, last_pos_wanted):
+    # já sabe o caminho
+    if positions != []:
+        while my_pos == positions[0]:
+            print('my_pos == next_pos')
+            positions.pop(0)
+
+        key = goToPosition(my_pos, positions[0])
+        positions.pop(0)
+        return key, positions
+
+    else: # pesquisar caminho
+        positions = astar(mapa.map, my_pos, goal, mapa, last_pos_wanted)
+        print('positions: ' + str(positions))
+
+        if positions == [] or positions == None:
+            print('Caminho nao encontrado...')
+            return choose_move(my_pos, ways, goal), []
+            #return ''
+
+        if len(positions) > 1:
+            positions.pop(0)
+
+        return goToPosition(my_pos, positions[0]),positions
 
 
 # retorna a key para um inimigo ou '' caso nao encontre
