@@ -322,7 +322,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                             # procura caminho para inimigo e parede
                             else:
 
-                                if positions !=[]: #fazer o mesmo para as paredes pois pode entrar em loop entre parede e enemie(numa pos encontra path to enemie e noutra nao)
+                                if positions !=[]:
                                     key, positions, goal = goTo(mapa, my_pos, ways, positions, wall, False)
                                 else:
                                     # procura caminho para inimigo
