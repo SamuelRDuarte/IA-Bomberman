@@ -103,6 +103,9 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                 # fuga recursiva
                 if state['bombs'] != [] and not calc_hide_pos:
                     tentativasRun += 1
+                    if tentativasRun > 13:#ciclo infinito, suicidio
+                        key = 'A'
+                        ways.append('A')
                     if tentativasRun > 3:
                         goal, calc_hide_pos = choose_hide_pos2(state['bombs'][0][0], state['bombs'][0], mapa, '', 0, 60,
                                                                state['enemies'], detonador)
