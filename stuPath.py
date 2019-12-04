@@ -245,8 +245,6 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                         print("going to exit")
                         #goal = state['exit']
                         key, positions,goal = goTo(mapa, my_pos, ways, positions, state['exit'], True)
-                        #if key == '':
-                        #    key, positions, goal = goTo(mapa, my_pos, ways, positions, state['exit'], True)
                         print('positions: ' + str(positions))
                         print('key from goTo (exit): ' + key)
                         print('goal' + str(goal))
@@ -311,22 +309,33 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
 
                                 if positions !=[] or (level == 1 and state['step'] >= 500):
                                     key, positions, goal = goTo(mapa, my_pos, ways, positions, wall, False)
+                                    print('positions: ' + str(positions))
+                                    print('key from goto Wall: ' + key)
+                                    print('goal' + str(goal))
+
                                 else:
                                     # procura caminho para inimigo
+                                    print('Procurar caminho para inimigo....')
                                     key = pathToEnemy(mapa, my_pos, enemies[0]['pos'])
+                                    print('key pathEnemy: ', key)
 
                                     if key == '':
+                                        print('Procurar para a parede...')
                                         key, positions, goal = goTo(mapa, my_pos, ways, positions, wall, False)
+                                        if key == '':
+                                            print('Pensar outra vez')
+                                            positions = []
+                                            key, positions, goal = goTo(mapa, my_pos, ways, positions, wall, False)
                                         print('positions: ' + str(positions))
-                                        print('key from gotoWall: ' + key)
+                                        print('key from goTo (wall): ' + key)
                                         print('goal' + str(goal))
 
 
                         else:
                             print('Encontrar caminho até à parede alvo: ' + str(wall))
-                            key, positions, goal = goTo(mapa, my_pos, ways, positions, wall,False)
+                            key, positions, goal = goTo(mapa, my_pos, ways, positions, wall, False)
                             print('positions: ' + str(positions))
-                            print('key from gotoWall: ' + key)
+                            print('key from goToWall: ' + key)
                             print('goal' + str(goal))
 
 
