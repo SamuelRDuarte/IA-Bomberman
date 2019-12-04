@@ -239,6 +239,9 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
 
                                     if key == '':
                                         key, positions, goal = goTo(mapa, my_pos, ways, positions, wall, False)
+                                        if key == '':
+                                            positions = []
+                                            key, positions, goal = goTo(mapa, my_pos, ways, positions, wall, False)
 
                         else:
                             key, positions, goal = goTo(mapa, my_pos, ways, positions, wall, False)
