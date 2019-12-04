@@ -309,7 +309,7 @@ class Game:
 
         if self._step % 100 == 0:
             logger.debug(
-                f"[{self._step}] SCORE {self._score} - LIVES {self._bomberman.lives}"
+                f"[{self._step}] SCORE {self._score} - LIVES {self._bomberman.lives} - Total Steps {self.total_steps}"
             )
 
         self.explode_bomb()

@@ -19,7 +19,6 @@ def closer_enemies(my_pos,lista):
 
         #Guarda uma lista de tuplos (id e distancia), ordenada por distancias
     lista1.sort(key=lambda x: x[0])  # ordenar por custo (distancia)
-    #print (lista1)
 
     return lista1
 

@@ -14,25 +14,14 @@ def get_possible_ways2(mapa, position):
     ways = []
 
     x, y = position
-    #print(mapa.map)
-    print(position)
-    print('direita: ' + str(mapa.map[x + 1][y]) + ' baixo: ' + str(mapa.map[x][y + 1]) + ' esquerda: ' + str(
-        mapa.map[x - 1][y]) + ' cima: ' + str(mapa.map[x][y - 1]))
-
-    print((x, y+1) in mapa._walls)
-    print([x, y+1] in mapa._walls)
     
     if not mapa.is_blocked([x+1, y]):
-        
         ways.append('d')
     if not mapa.is_blocked([x, y+1]):
-        
         ways.append('s')
     if not mapa.is_blocked([x-1, y]):
         ways.append('a')
-        
     if not mapa.is_blocked([x, y-1]):
-        
         ways.append('w')
 
     return ways
@@ -42,7 +31,6 @@ def get_possible_ways(mapa, position):
     ways = []
 
     x, y = position
-    print('direita:'+str(mapa.map[x+1][y])+'baixo:'+str(mapa.map[x][y+1])+'esquerda:'+str(mapa.map[x-1][y])+'cima:'+str(mapa.map[x][y-1]))
     
     tile1 = mapa.map[x+1][y]
     tile2 = mapa.map[x-1][y]
