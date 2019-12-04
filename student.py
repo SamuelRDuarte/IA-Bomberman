@@ -72,7 +72,6 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                         samePosCounter = 0
 
                     if previous_level != state['level'] or previous_lives != state['lives']:
-                        print('RESET')
                         calc_hide_pos = False
                         previous_level = state['level']
                         previous_lives = state['lives']
